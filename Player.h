@@ -1,37 +1,75 @@
 #pragma once
 #include "Point.h"
 #include "items.h"
-#include "Screen.h"
 #include "Direction.h"
-#include "Player.h"
+class Screen;
 class Player
 {
-	static constexpr size_t NUM_KEYS = 5;
+	static constexpr size_t NUM_KEYS = 6;
 	Point point;
-	Items* inventory;
-	char keys[NUM_KEYS];
+	char inventory;
+	char movekeys[NUM_KEYS];
+	char dropkey;
 	int life_points;
-
-
+	int power;
 public:
+
 	void keyPressed(char ch);
-	Player(char s, int x, int y,const char arr_keys[NUM_KEYS])
+	Player(char s, int x, int y,const char arr_keys[NUM_KEYS],char new_dropkey)
 	{
 		
-		point = { x,y,Direction::directions[Direction::RIGHT],s };
-		memcpy(keys, arr_keys, sizeof(keys[0]) * NUM_KEYS);
-		inventory = NULL;
-		life_points = 5;
+		point = { x,y,Direction::directions[Direction::STAY],s };
+		memcpy(movekeys, arr_keys, sizeof(movekeys[0]) * NUM_KEYS);
+		inventory = 'E';
+		dropkey = new_dropkey;
+		life_points = 3;
+		power = 1;
 
 	}
-	Player() : point(), inventory(nullptr), life_points(5) {}
+	Player() : point(), inventory(' '), life_points(3),power(1) {}
 
-	bool isFullInventory()
+	bool isFullInventory ()const
 	{
-		return this->inventory != NULL;
+		return this->inventory != 'E';
+	}
+	Point getPoint() const
+	{
+		return point;
+	}
+	int getlifePoint()const
+	{
+		return life_points;
+	}
+	void setLifePoints(int newPoints)
+	{
+		life_points = newPoints;
+	}
+	char getinventory()const
+	{
+		return inventory;
+	}
+	void freeze()
+	{
+		point.changeDir(Direction::directions[Direction::STAY]);
+	}
+	Direction getdirection()
+	{
+		return point.getDirection();
+	}
+	bool move_player_( Screen& screen,bool clearPass,char& stepchar);
+	void setPoint(int x ,int y,Direction dir);
+	char getItem() ;
+	void drop_item(Point p, Screen& screen);
+	void pick_item(Screen& screen);
+	void draw_player();
+	int getPower() const
+	{
+		return power;
+	}
+
+	void setPower(int new_power)
+	{
+		power = new_power;
 	}
 	
-	void move_player_( Screen& screen);
-
-
 };

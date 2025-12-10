@@ -5,7 +5,7 @@
 
 void Point::draw(char c) {
 	gotoxy(x, y);
-	std::cout << c;
+	std::cout << c<<std::flush;
 }
 
 void Point::move() {

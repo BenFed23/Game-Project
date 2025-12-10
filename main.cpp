@@ -1,11 +1,9 @@
-﻿#include <iostream>
-#include "Screen.h"
-#include "Point.h"
-#include "utils.h"
+﻿#include "Player.h"
 #include "Game.h"
 
-int main() {
+int main() 
+{
 	Game g;
 	g.Menu();
-	
+
 }

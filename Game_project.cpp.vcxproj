@@ -125,18 +125,23 @@
   <ItemGroup>
     <ClCompile Include="Direction.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="Items.cpp" />
     <ClCompile Include="items.h" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Point.cpp" />
+    <ClCompile Include="Riddle.cpp" />
     <ClCompile Include="Screen.cpp" />
     <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Direction.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="Key.h" />
+    <ClInclude Include="Obstacle.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Point.h" />
+    <ClInclude Include="Riddle.h" />
     <ClInclude Include="Screen.h" />
     <ClInclude Include="utils.h" />
   </ItemGroup>

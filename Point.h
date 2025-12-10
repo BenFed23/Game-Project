@@ -30,11 +30,34 @@ public:
 	int getY() const {
 		return y;
 	}
-	char getChar() const {
+	const char getChar() const {
 		return ch;
+	}
+	void setX(int new_x)
+	{
+		x = new_x;
+	}
+	void setY(int new_y)
+	{
+		y = new_y;
 	}
 	Direction getDirection() const
 	{
 		return dir;
 	}
+	void setChar(char c)
+	{
+		ch = c;
+	}
+	bool operator==(const Point& other) const
+	{
+		return (this->x == other.x && this->y == other.y);
+	}
+	
+
+	bool operator!=(const Point& other) const
+	{
+		return !(*this == other);
+	}
+
 };
