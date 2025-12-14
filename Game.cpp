@@ -10,21 +10,21 @@ Game::Game() : currentLevel(0), p1('$', 1, 1, "wdxas",'e'),p2('&',2,2,"ilmjk",'o
 	const char level0[Screen::MAX_Y][Screen::MAX_X] = {
 		"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW", // 0
 		"W                                                                             W",  // 1
-		"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW     W",  // 2
-		"W                             W                                               W",  // 3
-		"W                             W  1                                            W",  // 4
-		"W                             W                                               W",  // 5
-		"W                             W                                               W",  // 6
-		"W                       ?     W                           WWWWWWWWWWWWWW      W", // 7
-		"W                             W                           W           W       W",  // 8
-		"W                             W                           W     /    W        W",  // 9
-		"W                             W                               WWWWWWWWW       W",  // 10
-		"W                        K    W                                               W",  // 11
-		"W                             W                                               W",  // 12
-		"W                             W                                               W",  // 13
-		"W  WWWWWWWWWWWWWWWWWWWWWWWWWWWW                                               W",  // 17
+		"W                                                                             W",  // 2
+		"W                                                                             W",  // 3
+		"W                                1                                            W",  // 4
+		"W                                                                             W",  // 5
+		"W                                                                             W",  // 6
+		"W                       ?                                                     W", // 7
+		"W                                                                             W",  // 8
+		"W                                                               /             W",  // 9
+		"W                                                                             W",  // 10
+		"W                        K                                                    W",  // 11
+		"W                                                                             W",  // 12
+		"W                                                                             W",  // 13
+		"W                                                                             W",  // 17
 		"W                                                                             W",  // 14
-		"W   WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW     W",  // 15
+		"W                                                                             W",  // 15
 		"W                                                                             W",  // 16
 		"W                                                                             W",  // 18
 		"W                                                                             W",  // 19
@@ -40,23 +40,23 @@ Game::Game() : currentLevel(0), p1('$', 1, 1, "wdxas",'e'),p2('&',2,2,"ilmjk",'o
 
 	const char level1[Screen::MAX_Y][Screen::MAX_X] = {
 		"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW", // 0
-		"W                                                                 WWWWW  ?    W",  // 1
-		"W                                                                 WWWWW       W",  // 2
-		"W                                                                 WWWWWWWWWW  W",  // 3
+		"W                                                                        ?    W",  // 1
+		"W                                                                             W",  // 2
+		"W                                                                             W",  // 3
 		"W                                                             2               W",  // 4
-		"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW          W",  // 5
-		"W                                                  /               W          W",  // 6
-		"W                                                                  W          W",  // 7
-		"W                    WWWWWWWWWWWWWWWW                              W          W",  // 8
-		"W                    W           K  W                              W          W",  // 9
-		"W                    W  WWWWWWWWWWWWW                              W          W",  // 10
-		"W                    W                                             W          W",  // 11
-		"W                    WWWWWWWWWWWWWWW                               W          W",  // 12
-		"W                    WWWWWWWWWWWWWWW                               W          W",  // 13
-		"W                    WWWWWWWWWWWWWWW                               W          W",  // 14
-		"W                    WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW          W",  // 15
-		"W                    WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW          W",  // 16
-		"W                    WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW          W",  // 17
+		"W                                                                             W",  // 5
+		"W                                                  /                          W",  // 6
+		"W                                                                             W",  // 7
+		"W                                                                             W",  // 8
+		"W                                K                                            W",  // 9
+		"W                                                                             W",  // 10
+		"W                                                                             W",  // 11
+		"W                                                                             W",  // 12
+		"W                                                                             W",  // 13
+		"W                                                                             W",  // 14
+		"W                                                                             W",  // 15
+		"W                                                                             W",  // 16
+		"W                                                                             W",  // 17
 		"W                                                                             W",  // 18
 		"W                                                                             W",  // 19
 		"WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",  // 20
@@ -290,7 +290,7 @@ void Game::run()
 				if (result)
 				{
 					running = false;
-					break;
+					return;
 				}
 				else if (!result)
 				{
@@ -301,14 +301,14 @@ void Game::run()
 					continue;
 				}
 			}
-			if (tolower(key) == 'e' && p1.getItem() == 'K')  
+			if (tolower(key) == 'e' && p1.isFullInventory())  
 			{
 				p1.drop_item(p1.getPoint(), screen);
 				continue;    
 			}
 
 			
-			if (tolower(key) == 'o' && p2.getItem() == 'K')
+			if (tolower(key) == 'o' && p2.isFullInventory())
 			{
 				p2.drop_item(p2.getPoint(), screen);
 				continue;
@@ -442,14 +442,14 @@ void Game::Menu()
 			run();
 			//pausescreen
 			break;
-		case '2':
+		case '8':
 			cls();
 			instructions.drawRoom();
 			_getch();
 			break;
 
 
-		case '3':
+		case '9':
 			cls();
 			return;
 
@@ -466,6 +466,7 @@ bool Game::pauseMenu()
 	switch(choice)
 	{
 	case 'h':
+	case 'H':
 		return true;
 	case 27:
 		return false;

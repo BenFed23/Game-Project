@@ -5,7 +5,7 @@
 class Screen;
 class Player
 {
-	static constexpr size_t NUM_KEYS = 6;
+	static constexpr size_t NUM_KEYS = 5;
 	Point point;
 	char inventory;
 	char movekeys[NUM_KEYS];

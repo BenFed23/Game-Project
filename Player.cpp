@@ -33,7 +33,7 @@ bool Player::move_player_(Screen& screen, bool clearPass,char& stepchar)
 		point.draw();      
 		return false;      
 	}
-	old_location.draw(' ');
+	old_location.draw(screen.charAt(old_location));
 	pick_item(screen);
 	point.draw();
 	return true;         
@@ -55,8 +55,10 @@ void Player:: drop_item(Point drop_location,Screen& screen)
 		//screen.drawMessage("Inventory is empty");
 		return;
 	}
-	drop_location.setChar(inventory);
-	drop_location.draw();
+	screen.setChar(drop_location, inventory);
+
+	drop_location.draw(inventory);
+
 	inventory = 'E';
 }
 void Player:: pick_item(Screen& screen)
