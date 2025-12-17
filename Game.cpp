@@ -22,7 +22,7 @@ Game::Game() : currentLevel(0), p1('$', 1, 1, "wdxas",'e'),p2('&',2,2,"ilmjk",'o
 		"W                        K                                                    W",  // 11
 		"W                                                                             W",  // 12
 		"W                                                                             W",  // 13
-		"W                                                                             W",  // 17
+		"W                   *                                                         W",  // 17
 		"W                                                                             W",  // 14
 		"W                                                                             W",  // 15
 		"W                                                                             W",  // 16
@@ -321,6 +321,16 @@ void Game::run()
 		clearPass = switchesOn(screen) && ((p1.getinventory() == 'K') || (p2.getinventory() == 'K'))&&solved_Riddele;
 		Point prev_p1 = p1.getPoint();
 		Point prev_p2 = p2.getPoint();
+		Point next_p1 = prev_p1;
+		next_p1.move();
+
+		if(screen.isObstacle(next_p1)||(screen.isObstacle(p2.getPoint())))
+		{
+			Point arr[80];
+			Push(screen, arr, p1);
+		
+
+		}
 		bool move_p1 = p1.move_player_(screen, clearPass, next1);
 		bool move_p2 = p2.move_player_(screen, clearPass, next2);
 
@@ -410,7 +420,7 @@ void Game::run()
 				break;
 			}
 		}
-		Sleep(50);
+		Sleep(200);
 	}
 
 }
@@ -562,13 +572,15 @@ void Game::resetGame()
 }
 bool Game::Push(Screen& screen, Point arr[],Player& p)
 {
-	int obs_size = screen.obstacle(p.getPoint(), arr);
+	Point obs = p.getPoint();
+	obs.move();
+	int obs_size = screen.obstacle(obs, arr);
 
 	if (p.getPower() < obs_size)
 		return false;
 
 	
-	Direction dir = p.getPoint().getDirection(); 
+	Direction dir = obs.getDirection(); 
 	int dx = dir.getdirx(); 
 	int dy = dir.getdiry();
 
@@ -590,7 +602,7 @@ bool Game::Push(Screen& screen, Point arr[],Player& p)
 		char c = screen.charAt(dest);
 
 		
-		if (c == 'W')      
+		if (c == 'W' || (c >= '1' && c <= '4'))
 			return false;
 	
 	}
@@ -611,7 +623,7 @@ bool Game::Push(Screen& screen, Point arr[],Player& p)
 		arr[i].setY(new_y);
 
 		Point dest(new_x, new_y,
-			Direction::directions[Direction::STAY], '*');
+			Direction::directions[Direction::RIGHT], '*');
 		screen.setChar(dest, '*');
 	}
 
@@ -620,8 +632,12 @@ bool Game::Push(Screen& screen, Point arr[],Player& p)
 
 bool Game::pushing_together(Player& p1,Player& p2, Point arr1[],Point arr2[])
 {
-
-	if (screen.isObstacle(p1.getPoint()) && screen.isObstacle(p2.getPoint()))
+	Point obs1 = p1.getPoint();
+	obs1.move();
+	Point obs2 = p2.getPoint();
+	obs2.move();
+	if (p1.getPoint().getDirection() != p2.getPoint().getDirection()) return false;
+	if (screen.isObstacle(obs1) && screen.isObstacle(obs2))
 	{
 		int size1 = screen.obstacle(p1.getPoint(), arr1);
 		int size2 = screen.obstacle(p2.getPoint(), arr2);
@@ -638,6 +654,7 @@ bool Game::pushing_together(Player& p1,Player& p2, Point arr1[],Point arr2[])
 			}
 		
 		}
+		stopPower(p1, p2);
 		return false;
 	}
 	return false;

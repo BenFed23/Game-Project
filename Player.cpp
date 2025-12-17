@@ -23,6 +23,8 @@ bool Player::move_player_(Screen& screen, bool clearPass,char& stepchar)
 	Point next_location = point;
 	next_location.move();
 	stepchar = screen.charAt(next_location);
+	//obstacle
+
 	point.move();
 
 	
