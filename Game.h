@@ -2,11 +2,11 @@
 #include"Screen.h"
 #include"Player.h"
 #include "Riddle.h"
-
+#include <vector>
 
 class Game
 {
-	static const int NUMLEVELS=3;
+	static const int NUMLEVELS = 3;
 	Screen screen;
 	Screen current_riddle;
 	Screen gameMenu;
@@ -18,7 +18,8 @@ class Game
 	char riddles_chars[NUMLEVELS][Screen::MAX_Y][Screen::MAX_X];
 	int press_switches = 0;
 	int currentLevel;
-	Riddle riddles[NUMLEVELS-1];
+	Riddle riddles[NUMLEVELS - 1];
+	int visible_level = 1;
 
 public:
 	Game();
@@ -29,10 +30,10 @@ public:
 	void on_or_off_switch(Point& p, Screen& s);
 	bool switchesOn(Screen& screen);
 	void enterRoom();
-	bool riddle_answers(Riddle r,Player& p);
+	bool riddle_answers(Riddle r, Player& p);
 	void resetGame();
-	bool Push(Screen& screen, Point arr[],Player & p);
-	bool pushing_together(Player& p, Player& k, Point arr1[],Point arr2[]);
+	bool Push(Screen& screen, Player& p, int bonus_power = 0);
+	bool pushing_together(Player& p, Player& k, Screen& screen);
 	void stopPower(Player& p1, Player& p2);
-	
+	void handleMovement(Player& p, Player& other, bool clearPass);
 };

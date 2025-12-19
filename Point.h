@@ -16,11 +16,15 @@ public:
 		dir = the_dir;
 		ch = c;
 	}
-	void draw() {
+	void draw()
+	{
 		draw(ch);
 	}
 	void draw(char c);
 	void move();
+	Point next() const;
+
+
 	void changeDir(const Direction& new_dir) {
 		dir = new_dir;
 	}
@@ -53,7 +57,7 @@ public:
 	{
 		return (this->x == other.x && this->y == other.y);
 	}
-	
+
 
 	bool operator!=(const Point& other) const
 	{

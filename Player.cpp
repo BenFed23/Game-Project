@@ -5,8 +5,9 @@
 #include <cctype>
 #include "Point.h"
 #include <iostream>
-#include "Screen.h"
-void Player:: keyPressed(char ch)
+
+
+void Player::keyPressed(char ch)
 {
 	size_t index = 0;
 	for (char key : movekeys) {
@@ -17,42 +18,71 @@ void Player:: keyPressed(char ch)
 		++index;
 	}
 }
-bool Player::move_player_(Screen& screen, bool clearPass,char& stepchar)
+/*bool Player::move_player_(Screen& screen, bool clearPass, char& stepchar)
 {
 	Point old_location = point;
 	Point next_location = point;
 	next_location.move();
 	stepchar = screen.charAt(next_location);
-	//obstacle
-
 	point.move();
 
-	
+
 	if (screen.isWall(point) || (screen.isDoor(point) && !clearPass))
 	{
 		point = old_location;
 		point.changeDir(Direction::directions[Direction::STAY]);
-		point.draw();      
-		return false;      
+		point.draw();
+		return false;
 	}
 	old_location.draw(screen.charAt(old_location));
 	pick_item(screen);
 	point.draw();
-	return true;         
+	return true;
+}*/
+
+
+
+
+
+bool Player::move_player_(Screen& screen, bool canMove, char nextStepChar)
+{
+	if (!canMove)
+	{
+		point.draw();
+		return false;
+	}
+
+	point.draw(this->stepchar);
+
+	point.move();
+
+	this->stepchar = nextStepChar;
+
+	point.draw();
+
+	return true;
 }
+
+
+
+
+
+
+
+
 char Player::getItem()
 {
 	return (inventory);
 }
-void Player::setPoint(int x,int y,Direction dir)
+void Player::setPoint(int x, int y, Direction dir)
 {
 	point.setX(x);
 	point.setY(y);
 	point.changeDir(dir);
 }
-void Player:: drop_item(Point drop_location,Screen& screen)
+void Player::drop_item(Point drop_location, Screen& screen)
 {
-	if (inventory == 'E' )
+	if (inventory == 'E')
 	{
 		//screen.drawMessage("Inventory is empty");
 		return;
@@ -63,7 +93,7 @@ void Player:: drop_item(Point drop_location,Screen& screen)
 
 	inventory = 'E';
 }
-void Player:: pick_item(Screen& screen)
+/*void Player::pick_item(Screen& screen)
 {
 	if(isFullInventory())
 	{
@@ -90,10 +120,18 @@ void Player:: pick_item(Screen& screen)
 			screen.clearItem(point);
 		}
 	}
+}*/
+
+void Player::pick_item(Screen& screen, char itemToPick)
+{
+	if (isFullInventory()) return;
+
+	inventory = itemToPick;
+
+	screen.clearItem(point);
 }
 
 void Player::draw_player()
 {
 	point.draw();
 }
-

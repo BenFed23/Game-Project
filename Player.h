@@ -12,12 +12,16 @@ class Player
 	char dropkey;
 	int life_points;
 	int power;
+	char stepchar = ' ';
+
+	int player_room_level = 1;
+
 public:
 
 	void keyPressed(char ch);
-	Player(char s, int x, int y,const char arr_keys[NUM_KEYS],char new_dropkey)
+	Player(char s, int x, int y, const char arr_keys[NUM_KEYS], char new_dropkey)
 	{
-		
+
 		point = { x,y,Direction::directions[Direction::STAY],s };
 		memcpy(movekeys, arr_keys, sizeof(movekeys[0]) * NUM_KEYS);
 		inventory = 'E';
@@ -26,9 +30,9 @@ public:
 		power = 1;
 
 	}
-	Player() : point(), inventory(' '), life_points(3),power(1) {}
+	Player() : point(), inventory(' '), life_points(3), power(1) {}
 
-	bool isFullInventory ()const
+	bool isFullInventory()const
 	{
 		return this->inventory != 'E';
 	}
@@ -56,11 +60,14 @@ public:
 	{
 		return point.getDirection();
 	}
-	bool move_player_( Screen& screen,bool clearPass,char& stepchar);
-	void setPoint(int x ,int y,Direction dir);
-	char getItem() ;
+	//bool move_player_( Screen& screen,bool clearPass,char& stepchar);
+
+
+	bool move_player_(Screen& screen, bool canMove, char nextStepChar);
+	void setPoint(int x, int y, Direction dir);
+	char getItem();
 	void drop_item(Point p, Screen& screen);
-	void pick_item(Screen& screen);
+	void pick_item(Screen& screen, char itemToPick);
 	void draw_player();
 	int getPower() const
 	{
@@ -71,5 +78,22 @@ public:
 	{
 		power = new_power;
 	}
-	
+	char getStepChar() const
+	{
+		return stepchar;
+	}
+
+	void setStepChar(char c)
+	{
+		stepchar = c;
+	}
+
+	void setRoom(int room)
+	{
+		player_room_level = room;
+	}
+	int getRoom() const
+	{
+		return player_room_level;
+	}
 };

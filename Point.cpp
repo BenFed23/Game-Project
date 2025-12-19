@@ -5,10 +5,11 @@
 
 void Point::draw(char c) {
 	gotoxy(x, y);
-	std::cout << c<<std::flush;
+	std::cout << c << std::flush;
 }
 
-void Point::move() {
+void Point::move()
+{
 	if (x + dir.dirx < 0 || x + dir.dirx > Screen::MAX_X) {
 		dir.dirx = -dir.dirx;
 	}
@@ -17,4 +18,10 @@ void Point::move() {
 	}
 	x += dir.dirx;
 	y += dir.diry;
+}
+Point Point::next() const
+{
+	int nx = x + dir.dirx;
+	int ny = y + dir.diry;
+	return Point(nx, ny, dir, ch);
 }

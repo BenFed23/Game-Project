@@ -2,21 +2,26 @@
 #include "Point.h"
 #include "Player.h"
 #include <string>
+#include <vector>
+#include <iostream>
+
 
 class Screen {
 public:
 	static constexpr int MAX_X = 80;
 	static constexpr int MAX_Y = 25;
-	
-	
-	
+
+
+
 private:
-	
+
 	char level[MAX_Y][MAX_X];
-	
+
 	int SwitchCounters = 0;
-	
-	
+
+	bool isPointInVector(const std::vector<Point>& vec, int x, int y) const;
+
+
 public:
 	Screen();
 	Screen(const char input[MAX_Y][MAX_X]);
@@ -61,25 +66,14 @@ public:
 	{
 		return charAt(p) == '/';
 	}
-	bool isDoor(const Point& p) const
-	{
-		int num = charAt(p) - '0';
-		
-		if((num>4)||(num<1))
-		{
-			return false;
-		}
-		return true;
-	}
+	bool isDoor(const Point& p) const;
+
 	bool isWall(const Point& p) const
 	{
 		return charAt(p) == 'W';
 	}
-	
-	void setChar(const Point& p, char ch)
-	{
-		level[p.getY()][p.getX()] = ch;
-	}
+
+	void setChar(const Point& p, char ch);
 
 	int get_switch_counters()
 	{
@@ -88,6 +82,7 @@ public:
 	void clearItem(const Point& p);
 	void drawRoom() const;
 	void drawStatus(const Player& p1, const Player& p2) const;
-	int obstacle(const Point& p, Point obstacle_array[]);
+	std::vector<Point> getObstacleVector(Point startPoint);
+	bool isPointPartOfObstacle(const std::vector<Point>& obstacle, const Point& p) const;
 
 };
