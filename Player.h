@@ -14,7 +14,7 @@ class Player
 	int power;
 	char stepchar = ' ';
 
-	int player_room_level = 1;
+	int player_room_level = 0;
 
 public:
 
