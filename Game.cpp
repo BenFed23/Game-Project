@@ -321,9 +321,62 @@ void Game::run() {
         handleMovement(p1, p2, clearPass);
         handleMovement(p2, p1, clearPass);
 
-        // עדכון מתגים
-        if (!(p1.getPoint() == prev_p1)) {
-            if (screen.isPlatform_on(prev_p1) || screen.isPlatform_off(prev_p1)) {
+            if (p1_next_char == '#')
+            {
+
+                 Spring* s = getSpringAt(p1.getPoint().next());
+            
+                 bool isCompressingKey = match_directions(s, p1);
+
+                if (s != nullptr)
+                {
+                    if (isCompressingKey && !s->isFullyCompressed()) {
+                        s->compress(); //
+
+                        // מחיקה וציור ידני כדי לא להשתמש ב-move_player שדורס את ה-level
+                        gotoxy(p1.getPoint().getX(), p1.getPoint().getY());
+                        std::cout << ' ';
+
+                        // עדכון המיקום הלוגי של השחקן - חובה!
+                        p1.setPoint(nextP1.getX(), nextP1.getY(), p1.getdirection()); 
+
+                        s->draw(); // מצייר את הקפיץ המכווץ
+                        p1.draw_player();
+
+                        p1_activeSpring = s;
+                    
+                    }
+                    else if (s->isFullyCompressed())
+                    {
+                        release_spring(p1, s, screen);
+                    }
+                    else if (!isCompressingKey && s->getcurrentCompressed() > 0)
+                    {
+                        release_spring(p1, s, screen);
+                    }
+                    else if (!isCompressingKey)
+                    {
+                        p1.freeze();
+                    }
+                }
+                else
+                {
+					p1.freeze();
+                }
+            }
+            else
+            {
+                handleMovement(p1, p2, p1canpass);
+            }
+        }
+       
+        if (p2.getRoom() == currentLevel) 
+            handleMovement(p2, p1, p2canpass);
+
+        if (p1.getRoom() == currentLevel && !(p1.getPoint() == prev_p1))
+        {
+            if (screen.isPlatform_on(prev_p1) || screen.isPlatform_off(prev_p1)) 
+            {
                 on_or_off_switch(prev_p1, screen);
             }
         }
