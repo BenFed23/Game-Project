@@ -60,7 +60,7 @@ public:
 	{
 		return point.getDirection();
 	}
-	//bool move_player_( Screen& screen,bool clearPass,char& stepchar);
+	
 
 
 	bool move_player_(Screen& screen, bool canMove, char nextStepChar);

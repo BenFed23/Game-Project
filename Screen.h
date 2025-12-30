@@ -25,12 +25,25 @@ private:
 public:
 	Screen();
 	Screen(const char input[MAX_Y][MAX_X]);
+	Screen(const std::string& filename)
+	{
+		memset(level, ' ', sizeof(level));
+		SwitchCounters = 0;
+		loadefile(filename); 
+	}
 
 	char charAt(const Point& p) const
 	{
 		return level[p.getY()][p.getX()];
 	}
-
+	bool isPlayer(const Point& p)
+	{
+		if(((charAt(p))=='$')||((charAt(p)) == '&'))
+		{
+			return true;
+		}
+		return false;
+	}
 
 
 	bool isBomb(const Point& p) const
@@ -53,6 +66,11 @@ public:
 	{
 		return charAt(p) == '?';
 
+	}
+	
+	 char (*getScreen() )[MAX_X]
+	{
+		return level;
 	}
 	bool isObstacle(const Point& p) const
 	{
@@ -79,10 +97,18 @@ public:
 	{
 		return SwitchCounters;
 	}
+	bool antiBoom(const Point& p)
+	{
+		if ((charAt(p) == 'W') || (charAt(p) == 'K') || ((charAt(p) == '@')) || ((charAt(p) == '!')) || ((charAt(p) == '#')))
+		{
+			return true;
+		}
+		return false;
+	}
 	void clearItem(const Point& p);
 	void drawRoom() const;
 	void drawStatus(const Player& p1, const Player& p2) const;
 	std::vector<Point> getObstacleVector(Point startPoint);
 	bool isPointPartOfObstacle(const std::vector<Point>& obstacle, const Point& p) const;
-
+	bool loadefile(const std::string& filename);
 };

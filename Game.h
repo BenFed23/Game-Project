@@ -3,9 +3,12 @@
 #include"Player.h"
 #include "Riddle.h"
 #include <vector>
+#include "Circle.h"
+#include<string>
 
 class Game
 {
+	bool isDark = false;
 	static const int NUMLEVELS = 3;
 	Screen screen;
 	Screen current_riddle;
@@ -20,7 +23,8 @@ class Game
 	int currentLevel;
 	Riddle riddles[NUMLEVELS - 1];
 	int visible_level = 1;
-
+	std::vector<std::string> worldFiles;
+	std::vector<std::string> riddleFiles;
 public:
 	Game();
 	void run();
@@ -36,4 +40,7 @@ public:
 	bool pushing_together(Player& p, Player& k, Screen& screen);
 	void stopPower(Player& p1, Player& p2);
 	void handleMovement(Player& p, Player& other, bool clearPass);
+	void boom(Circle c,Screen& screen);
+	bool fileToArray(const std::string& filename, char dest[Screen::MAX_Y][Screen::MAX_X]);
+	bool fileToLevel(const std::string& filename, Screen& target);
 };

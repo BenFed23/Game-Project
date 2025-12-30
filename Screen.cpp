@@ -1,10 +1,10 @@
-#include <iostream>
+ן»¿#include <iostream>
 #include "Player.h"
 #include "Screen.h"
 #include "utils.h"
-#include <string.h>
 #include<Windows.h>
-
+#include <fstream>
+#include <string>
 Screen::Screen()
 {
     memset(level, ' ', sizeof(level));
@@ -29,7 +29,7 @@ void Screen::drawRoom() const {
         gotoxy(0, y);
         for (int x = 0; x < MAX_X; x++) {
             char c = level[y][x];
-            if (c == '\0') c = ' '; // אם חסר תו, תחליף ברווח
+            if (c == '\0') c = ' '; 
             std::cout << c;
         }
     }
@@ -154,3 +154,29 @@ bool Screen::isDoor(const Point& p) const
     }
     return true;
 }
+bool Screen::loadefile(const std::string& filename)
+{
+    std::ifstream file(filename);
+    if (!file) return false;
+
+    SwitchCounters = 0;
+    std::string line;
+
+    for (int y = 0; y < Screen::MAX_Y; y++)
+    {
+        if (!std::getline(file, line)) line.clear();
+
+        if (!line.empty() && line.back() == '\r')  
+            line.pop_back();
+
+        for (int x = 0; x < Screen::MAX_X; x++)
+        {
+            char c = (x < (int)line.size()) ? line[x] : ' ';
+            level[y][x] = c;
+            if (c == '/') SwitchCounters++;
+        }
+    }
+    return true;
+}
+
+

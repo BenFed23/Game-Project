@@ -45,6 +45,12 @@
     <ClCompile Include="Items.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Circle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Tourch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h">
@@ -74,5 +80,21 @@
     <ClInclude Include="Obstacle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Circle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Tourch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="adv-world_01.screen" />
+    <None Include="adv-world_02.screen" />
+    <None Include="adv-world_03.screen" />
+    <None Include="adv-world_menu.screen" />
+    <None Include="adv-world_indructions.screen" />
+    <None Include="adv-world_01.riddle" />
+    <None Include="adv-world_02.riddle" />
+    <None Include="adv-world_pause.screen" />
   </ItemGroup>
 </Project>
