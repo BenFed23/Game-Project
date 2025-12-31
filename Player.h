@@ -2,6 +2,8 @@
 #include "Point.h"
 #include "items.h"
 #include "Direction.h"
+
+
 class Screen;
 class Player
 {
@@ -13,6 +15,10 @@ class Player
 	int life_points;
 	int power;
 	char stepchar = ' ';
+	int boostFramesLeft = 0; //time remaining for boost
+	int boostSpeed = 0;
+	Direction Boost_dir = Direction::directions[Direction::STAY];
+	char symbol = 'P';
 
 	int player_room_level = 0;
 
@@ -60,7 +66,6 @@ public:
 	{
 		return point.getDirection();
 	}
-	//bool move_player_( Screen& screen,bool clearPass,char& stepchar);
 
 
 	bool move_player_(Screen& screen, bool canMove, char nextStepChar);
@@ -69,6 +74,26 @@ public:
 	void drop_item(Point p, Screen& screen);
 	void pick_item(Screen& screen, char itemToPick);
 	void draw_player();
+	bool isPlayerKey(char ch) const;
+	void reduceBoost();
+	void startLaunch(int speed, int duration, const Direction& dir);
+	void resetBoost();
+
+	bool justpicked;
+
+	void set_justpicked(bool is_picked)
+	{
+		justpicked = is_picked;;
+	}
+	bool get_justpicked() const
+	{
+		return justpicked;
+	}
+
+	void setInventory(char item)
+	{
+		inventory = item;
+	}
 	int getPower() const
 	{
 		return power;
@@ -95,5 +120,34 @@ public:
 	int getRoom() const
 	{
 		return player_room_level;
+	}
+	bool isInBoost() const
+	{
+		return boostFramesLeft > 0;
+	}
+
+	
+	bool operator==(const Player& other) const
+	{
+		return (this->symbol == other.symbol);
+	}
+
+	void setDirection(const Direction& dir)
+	{
+		point.changeDir(dir);
+	}
+
+	int get_boostSpeed() const
+	{
+		return boostSpeed;
+	}
+
+	int get_boostFramesLeft() const
+	{
+		return boostFramesLeft;
+	}
+	Direction getBoostDir() const
+	{
+		return Boost_dir;
 	}
 };

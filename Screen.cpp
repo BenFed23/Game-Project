@@ -3,7 +3,10 @@
 #include "Screen.h"
 #include "utils.h"
 #include <string.h>
-#include<Windows.h>
+#include <Windows.h>
+#include <algorithm>
+
+
 
 Screen::Screen()
 {
@@ -11,25 +14,74 @@ Screen::Screen()
 }
 Screen::Screen(const char input[MAX_Y][MAX_X])
 {
-    for (int y = 0; y < MAX_Y; y++) {
-        for (int x = 0; x < MAX_X; x++) {
+
+    for (int y = 0; y < MAX_Y; y++)
+    {
+        for (int x = 0; x < MAX_X; x++)
+        {
             level[y][x] = input[y][x];
             if (level[y][x] == '/')
             {
                 SwitchCounters++;
             }
+
         }
 
+    }
+    for (int y = 0; y < MAX_Y; y++)
+    {
+        for (int x = 0; x < MAX_X; x++)
+        {
+            if (level[y][x] == '#')
+            {
+                bool alreadyInSpring = false;
+                for (const auto& s : springs)
+                {
+                    if (s.isPointOnSpring(Point(x, y)))
+                    {
+                        alreadyInSpring = true;
+                        break;
+                    }
+                }
+
+
+                if (!alreadyInSpring)
+                {
+                    std::vector<Point> springPoints = getSpringVector(Point(x, y));
+                    Direction dir = Direction::directions[Direction::LEFT];
+
+                    if (x == 1)
+                    {
+                        dir = Direction::directions[Direction::RIGHT];
+                    }
+                    else if (x == MAX_X - 2)
+                    {
+                        dir = Direction::directions[Direction::LEFT];
+                    }
+                    else if (y == MAX_Y - 2)
+                    {
+                        dir = Direction::directions[Direction::UP];
+                    }
+
+                    springs.emplace_back(springPoints, dir, '#');
+                }
+            }
+
+
+        }
     }
 
 }
 
-void Screen::drawRoom() const {
-    for (int y = 0; y < MAX_Y; y++) {
+void Screen::drawRoom() const
+{
+    for (int y = 0; y < MAX_Y; y++)
+    {
         gotoxy(0, y);
-        for (int x = 0; x < MAX_X; x++) {
+        for (int x = 0; x < MAX_X; x++)
+        {
             char c = level[y][x];
-            if (c == '\0') c = ' '; // אם חסר תו, תחליף ברווח
+            if (c == '\0') c = ' ';
             std::cout << c;
         }
     }
@@ -103,21 +155,25 @@ std::vector<Point> Screen::getObstacleVector(Point startPoint) //creating the ob
 
     int head = 0;
 
-    while (head < toCheck.size()) {
+    while (head < toCheck.size())
+    {
         Point current = toCheck[head++];
 
         int dx[] = { 0, 0, 1, -1 };
         int dy[] = { 1, -1, 0, 0 };
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 4; i++)
+        {
             int nextX = current.getX() + dx[i];
             int nextY = current.getY() + dy[i];
 
             if (nextX >= 0 && nextX < MAX_X && nextY >= 0 && nextY < MAX_Y) {
 
-                if (level[nextY][nextX] == '*') {
+                if (level[nextY][nextX] == '*')
+                {
 
-                    if (!isPointInVector(obstaclePoints, nextX, nextY)) {
+                    if (!isPointInVector(obstaclePoints, nextX, nextY))
+                    {
 
                         Point neighbor(nextX, nextY, Direction::directions[Direction::STAY], '*');
 
@@ -130,6 +186,46 @@ std::vector<Point> Screen::getObstacleVector(Point startPoint) //creating the ob
     }
 
     return obstaclePoints;
+}
+
+std::vector<Point> Screen::getSpringVector(Point startPoint) //creating the spring vector
+{
+    std::vector<Point> springPoints;
+    std::vector<Point> toCheck;
+
+    if (charAt(startPoint) != '#') return springPoints;
+
+    toCheck.push_back(startPoint);
+    springPoints.push_back(startPoint);
+
+    int head = 0;
+
+    while (head < toCheck.size())
+    {
+        Point current = toCheck[head++];
+        int dx[] = { 0, 0, 1, -1 };
+        int dy[] = { 1, -1, 0, 0 };
+
+        for (int i = 0; i < 4; i++)
+        {
+            int nextX = current.getX() + dx[i];
+            int nextY = current.getY() + dy[i];
+
+            if (nextX >= 0 && nextX < MAX_X && nextY >= 0 && nextY < MAX_Y)
+            {
+                if (level[nextY][nextX] == '#')
+                {
+                    if (!isPointInVector(springPoints, nextX, nextY))
+                    {
+                        Point neighbor(nextX, nextY, Direction::directions[Direction::STAY], '#');
+                        springPoints.push_back(neighbor);
+                        toCheck.push_back(neighbor);
+                    }
+                }
+            }
+        }
+    }
+    return springPoints;
 }
 
 bool Screen::isPointPartOfObstacle(const std::vector<Point>& obstacle, const Point& p) const  //covering the function isPointInVector to get it outside the class
@@ -153,4 +249,17 @@ bool Screen::isDoor(const Point& p) const
         return false;
     }
     return true;
+}
+
+
+void Screen::debugShowAllSprings()
+{
+    int springCounter = 0;
+    for (auto& s : springs) {
+        springCounter++;
+        s.debugPrintIndices();
+
+        gotoxy(60, 2 + springCounter);
+        std::cout << "Spring #" << springCounter << " size: " << s.get_original_size();
+    }
 }

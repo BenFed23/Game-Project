@@ -16,6 +16,11 @@ public:
 		dir = the_dir;
 		ch = c;
 	}
+	Point(int x2,int y2)
+	{
+		x = x2;
+		y = y2;
+	}
 	void draw()
 	{
 		draw(ch);
@@ -63,5 +68,8 @@ public:
 	{
 		return !(*this == other);
 	}
-
+	Point next(const Direction& dir) const 
+	{
+		return Point(x + dir.getdirx(), y + dir.getdiry());
+	}
 };

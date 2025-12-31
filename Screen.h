@@ -4,9 +4,10 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include "Spring.h"
 
-
-class Screen {
+class Screen
+{
 public:
 	static constexpr int MAX_X = 80;
 	static constexpr int MAX_Y = 25;
@@ -21,6 +22,7 @@ private:
 
 	bool isPointInVector(const std::vector<Point>& vec, int x, int y) const;
 
+	std::vector<Spring> springs;
 
 public:
 	Screen();
@@ -31,7 +33,10 @@ public:
 		return level[p.getY()][p.getX()];
 	}
 
-
+	std::vector<Spring>& getSprings()
+	{
+		return springs;
+	}
 
 	bool isBomb(const Point& p) const
 	{
@@ -84,5 +89,6 @@ public:
 	void drawStatus(const Player& p1, const Player& p2) const;
 	std::vector<Point> getObstacleVector(Point startPoint);
 	bool isPointPartOfObstacle(const std::vector<Point>& obstacle, const Point& p) const;
-
+	std::vector<Point> getSpringVector(Point startPoint);
+	void debugShowAllSprings();
 };

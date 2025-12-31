@@ -1,6 +1,7 @@
 #pragma once
 
-class Direction {
+class Direction 
+{
 	int dirx, diry;
 	friend class Point;
 public:
@@ -9,11 +10,11 @@ public:
 	Direction(int dir_x, int dir_y)
 		: dirx(dir_x), diry(dir_y) {
 	}
-	int getdirx()
+	int getdirx() const
 	{
 		return dirx;
 	}
-	int getdiry()
+	int getdiry() const
 	{
 		return diry;
 	}
