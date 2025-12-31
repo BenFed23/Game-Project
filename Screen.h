@@ -17,8 +17,8 @@ public:
 private:
 
 	char level[MAX_Y][MAX_X];
-
 	int SwitchCounters = 0;
+	std::vector<Spring>springs;
 
 	bool isPointInVector(const std::vector<Point>& vec, int x, int y) const;
 
@@ -26,11 +26,27 @@ private:
 
 public:
 	Screen();
-	Screen(const char input[MAX_Y][MAX_X]);
+	//Screen(const char input[MAX_Y][MAX_X]);
+	Screen(const std::string& filename)
+	{
+		memset(level, ' ', sizeof(level));
+		SwitchCounters = 0;
+		loadefile(filename); 
+		
+		buildSprings();
+	}
 
 	char charAt(const Point& p) const
 	{
 		return level[p.getY()][p.getX()];
+	}
+	bool isPlayer(const Point& p)
+	{
+		if(((charAt(p))=='$')||((charAt(p)) == '&'))
+		{
+			return true;
+		}
+		return false;
 	}
 
 	std::vector<Spring>& getSprings()
@@ -59,6 +75,11 @@ public:
 		return charAt(p) == '?';
 
 	}
+	
+	 char (*getScreen() )[MAX_X]
+	{
+		return level;
+	}
 	bool isObstacle(const Point& p) const
 	{
 		return charAt(p) == '*';
@@ -84,11 +105,31 @@ public:
 	{
 		return SwitchCounters;
 	}
+	bool antiBoom(const Point& p)
+	{
+		if ((charAt(p) == 'W') || (charAt(p) == 'K') || ((charAt(p) == '@')) || ((charAt(p) == '!')) || ((charAt(p) == '#')))
+		{
+			return true;
+		}
+		return false;
+	}
 	void clearItem(const Point& p);
 	void drawRoom() const;
 	void drawStatus(const Player& p1, const Player& p2) const;
 	std::vector<Point> getObstacleVector(Point startPoint);
 	bool isPointPartOfObstacle(const std::vector<Point>& obstacle, const Point& p) const;
+	bool loadefile(const std::string& filename);
+	void buildSprings();
 	std::vector<Point> getSpringVector(Point startPoint);
-	void debugShowAllSprings();
+	
+
+
+	void debugPrintSpringDir(const Spring& s) const;
+
+
+	std::vector<Spring>& getSprings()
+	{
+		return springs;
+	}
+	
 };

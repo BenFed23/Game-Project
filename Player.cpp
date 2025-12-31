@@ -64,34 +64,7 @@ void Player::drop_item(Point drop_location, Screen& screen)
 
 	inventory = 'E';
 }
-/*void Player::pick_item(Screen& screen)
-{
-	if(isFullInventory())
-	{
-		//screen.drawMessage("Inventory is full");
-		return;
-	}
-	else
-	{
-		if (screen.isKey(point))
-		{
-			inventory = 'K';
-			screen.clearItem(point);
-		}
 
-		else if (screen.isBomb(point))
-		{
-
-			inventory = '@';
-			screen.clearItem(point);
-		}
-		else if (screen.isTorch(point))
-		{
-			inventory = '!';
-			screen.clearItem(point);
-		}
-	}
-}*/
 
 void Player::pick_item(Screen& screen, char itemToPick)
 {
@@ -106,8 +79,6 @@ void Player::draw_player()
 {
 	point.draw();
 }
-
-
 void Player::resetBoost() //after boost ends
 {
 	boostFramesLeft = 0;

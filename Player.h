@@ -21,7 +21,7 @@ class Player
 	char symbol = 'P';
 
 	int player_room_level = 0;
-
+	char symbol = 'P';
 public:
 
 	void keyPressed(char ch);
@@ -67,6 +67,11 @@ public:
 		return point.getDirection();
 	}
 
+
+	void setInventory(char item)
+	{
+		inventory = item;
+	}
 
 	bool move_player_(Screen& screen, bool canMove, char nextStepChar);
 	void setPoint(int x, int y, Direction dir);

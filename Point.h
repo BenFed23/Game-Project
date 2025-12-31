@@ -10,6 +10,7 @@ class Point {
 	char ch = '*';
 public:
 	Point() {}
+	
 	Point(int x1, int y1, const Direction& the_dir, char c) {
 		x = x1;
 		y = y1;
@@ -25,11 +26,7 @@ public:
 	{
 		draw(ch);
 	}
-	void draw(char c);
-	void move();
-	Point next() const;
-
-
+	
 	void changeDir(const Direction& new_dir) {
 		dir = new_dir;
 	}
@@ -68,6 +65,11 @@ public:
 	{
 		return !(*this == other);
 	}
+	double distance(Point p);
+	void draw(char c);
+	void move();
+	Point next() const;
+
 	Point next(const Direction& dir) const 
 	{
 		return Point(x + dir.getdirx(), y + dir.getdiry());

@@ -5,267 +5,34 @@
 #include "utils.h"
 #include <iostream>
 #include "Riddle.h"
+#include "Circle.h"
 
 
 Game::Game() : currentLevel(0), p1('$', 1, 1, "wdxas", 'e'), p2('&', 2, 2, "ilmjk", 'o')
 {
+  
 
-    const char level0[Screen::MAX_Y][Screen::MAX_X] =
-    {  //0123456789012345678901234567890123456789012345678901234567890123456789012345678
-        "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-        "W                                                                 #           W",
-        "W                                                                 #           W",
-        "W                                                                 #           W",
-        "W                                1                                #           W",
-        "W####                                               K                         W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                        ?                                                    W",
-        "W                                                                             W",
-        "W                                                               /             W",
-        "W                                    2                                   #####W",
-        "W                         K                         *     *                   W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                      #                                      W",
-        "W       #                              #                                      W",
-        "W       #                              #                                      W",
-        "W       #                              #                                      W",
-        "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-        "                                                                               ",
-        "                                                                               ",
-        "                                                                               ",
-        "                                                                               "
+    
+    fileToLevel("adv-world_menu.screen", gameMenu);
+    fileToLevel("pause.screen", pauseScreen);
+    fileToLevel("adv-world_indructions.screen", instructions);
+    std::vector<std::string> levelFiles = {
+    "adv-world_01.screen",
+    "adv-world_02.screen",
+    "adv-world_03.screen"
     };
 
-    const char level1[Screen::MAX_Y][Screen::MAX_X] =
-    {
-        "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-        "W                                                                        ?    W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                             2               W",
-        "W                                                                             W",
-        "W                                                   /                         W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                 K                                           W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-        "                                                                               ",
-        "                                                                               ",
-        "                                                                               ",
-        "                                                                               "
+    std::vector<std::string> riddleFiles = {
+        "adv-world_01.riddle",
+        "adv-world_02.riddle"
     };
+    for (size_t i = 0; i < levelFiles.size(); ++i)
+        fileToArray(levelFiles[i], levels[i]);
 
-    const char level2[Screen::MAX_Y][Screen::MAX_X] =
-    {
-        "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-        "W                                                                             W",
-        "W                WWWWWWWWWW      W        W        WWWWWWWWWWW                W",
-        "W                     W          W        W        W                          W",
-        "W                     W          W        W        W                          W",
-        "W                     W          WWWWWWWWWW        WWWWWWWWWWW                W",
-        "W                     W          W        W        W                          W",
-        "W                     W          W        W        W                          W",
-        "W                     W          W        W        WWWWWWWWWWW                W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                  WWWWWWWWW     W           W       WWWWWW                   W",
-        "W                  W             WW          W       W     W                  W",
-        "W                  W             W  W        W       W      W                 W",
-        "W                  WWWWWWWWW     W    W      W       W     W                  W",
-        "W                  W             W      W    W       W    W                   W",
-        "W                  W             W        W  W       W   W                    W",
-        "W                  WWWWWWWWW     W          WW       WWWW                     W",
-        "W                                                                             W",
-        "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-        "                                                                               ",
-        "                                                                               ",
-        "                                                                               ",
-        "                                                                               "
-    };
-
-    const char opening[Screen::MAX_Y][Screen::MAX_X] =
-    {
-        "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-        "W                                                                             W",
-        "W                             MENU:                                           W",
-        "W          --------------------------------------------                       W",
-        "W                                                                             W",
-        "W                   TO PLAY THE GAME PRESS [1]                                W",
-        "W                                                                             W",
-        "W                   FOR INSTRUCTIONS PRESS [8]                                W",
-        "W                                                                             W",
-        "W                   TO EXIT PRESS [9]                                         W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
-    };
-
-    const char instructionsScreen[Screen::MAX_Y][Screen::MAX_X] =
-    {
-        "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                               INTRUCTIONS                                   W",
-        "W                  ----------------------------------                         W",
-        "W                      PLAYER 1 KEYS:                                         W",
-        "W               W - UP                                                        W",
-        "W               A - LEFT                                                      W",
-        "W               D - RIGHT                                                     W",
-        "W               X - DOWN                                                      W",
-        "W               S - STAY                                                      W",
-        "W               E - DROP ITEM                                                 W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                      PLAYER 2 KEYS:                                         W",
-        "W               I - UP                                                        W",
-        "W               J - LEFT                                                      W",
-        "W               L - RIGHT                                                     W",
-        "W               M - DOWN                                                      W",
-        "W               K - STAY                                                      W",
-        "W               O - DROP ITEM                                                 W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
-    };
-
-    const char pauseMenuArr[Screen::MAX_Y][Screen::MAX_X] =
-    {
-        "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                           GAME PAUSED                                       W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W              PRESS ESC TO CONTINUE, OR H TO EXIT THE GAME                   W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
-    };
-
-    const char riddle1[Screen::MAX_Y][Screen::MAX_X] =
-    {
-        "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-        "W                                                                             W",
-        "W                            RIDDLE NUMBER 1:                                 W",
-        "W                ----------------------------------------                     W",
-        "W                                                                             W",
-        "W           in which battle the normans conquered england?                    W",
-        "W                                                                             W",
-        "W            1. the battle of cannae  - press A                               W",
-        "W                                                                             W",
-        "W            2. the battle of pavia - press B                                 W",
-        "W                                                                             W",
-        "W            3. the battle of the somme - press C                             W",
-        "W                                                                             W",
-        "W            4. the battle of hastings - press D                              W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-        "                                                                               ",
-        "                                                                               ",
-        "                                                                               ",
-        "                                                                               "
-    };
-
-    const char riddle2[Screen::MAX_Y][Screen::MAX_X] = {
-        "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-        "W                                                                             W",
-        "W                            RIDDLE NUMBER 2:                                 W",
-        "W                ----------------------------------------                     W",
-        "W                                                                             W",
-        "W              what is the name of the sword of king arthur                   W",
-        "W                                                                             W",
-        "W            1. Joseph Shlomi  - press A                                      W",
-        "W                                                                             W",
-        "W            2. the dwarf's slayer - press B                                  W",
-        "W                                                                             W",
-        "W            3. excalibur - press C                                           W",
-        "W                                                                             W",
-        "W            4. amir hetsroni  - press D                                      W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "W                                                                             W",
-        "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-        "                                                                               ",
-        "                                                                               ",
-        "                                                                               ",
-        "                                                                               "
-    };
-
-    for (int y = 0; y < Screen::MAX_Y; y++)
-    {
-        for (int x = 0; x < Screen::MAX_X; x++)
-        {
-            levels[0][y][x] = level0[y][x];
-            levels[1][y][x] = level1[y][x];
-            levels[2][y][x] = level2[y][x];
-        }
-    }
-    for (int y = 0; y < Screen::MAX_Y; y++)
-    {
-        for (int x = 0; x < Screen::MAX_X; x++)
-        {
-            riddles_chars[0][y][x] = riddle1[y][x];
-            riddles_chars[1][y][x] = riddle2[y][x];
-        }
-    }
-
-
-
-    current_riddle = Screen(riddles_chars[currentLevel]);
+    for (size_t i = 0; i < riddleFiles.size(); ++i)
+        fileToArray(riddleFiles[i], riddles_chars[i]);
     screen = Screen(levels[currentLevel]);
-    gameMenu = Screen(opening);
-    instructions = Screen(instructionsScreen);
-    pauseScreen = Screen(pauseMenuArr);
+    current_riddle = Screen(riddles_chars[currentLevel]);
     press_switches = 0;
     riddles[0] = Riddle('D');
     riddles[1] = Riddle('C');
@@ -276,9 +43,12 @@ void Game::run()
     constexpr char ESC = 27;
     char key = 0;
     bool running = true;
-    bool clearPass = false;
+    bool clearPass;
     p1canpass = false;
     p2canpass = false;
+    bool solved_Riddle = false;
+    bool wrong;
+    isGameOver = false;
     hideCursor();
     cls();
     Player* lastPlayerToExit = nullptr; // Track the last player who exited the room
@@ -302,8 +72,9 @@ void Game::run()
             if (key == ESC)
             {
                 bool result = pauseMenu();
-                if (result) return; // Exit to main menu
-                else {
+                if (result) return; 
+                else 
+                {
                     cls();
                     screen.drawRoom();
                     key = 0;
@@ -323,6 +94,60 @@ void Game::run()
 
         Point prev_p1 = p1.getPoint();
         Point prev_p2 = p2.getPoint();
+      /*  if (tolower(key) == 'e' && p1.getinventory() == '@')
+        {
+            if (p1.getdirection() == Direction::directions[Direction::STAY])
+            {
+                Point bombCenter = p1.getPoint();
+                Direction d = p1.getdirection();
+                bombCenter.changeDir(d);
+                for (int i = 0; i < 4; i++)
+                {
+                    Point next = bombCenter;
+                    next.move();
+
+
+                    if (screen.isWall(next))
+                        break;
+
+                    bombCenter = next;
+                }
+
+                Circle  c = { 2,prev_p1 };
+                p1.drop_item(p1.getPoint(), screen);
+                boom(c, screen);
+            }
+               
+        }
+        if (tolower(key) == 'o' && p2.getinventory() == '@')
+        {
+            if (p2.getdirection() == Direction::directions[Direction::STAY])
+            {
+                Point bombCenter = p1.getPoint();
+                Direction d = p1.getdirection();
+                bombCenter.changeDir(d);
+                for (int i = 0; i < 4; i++)   
+                {
+                    Point next = bombCenter;
+                    next.move();
+
+                   
+                    if (screen.isWall(next))
+                        break;
+
+                    bombCenter = next;
+                }
+
+                Circle  c = { 3,prev_p1 };
+                p2.drop_item(p2.getPoint(), screen);
+                boom(c, screen);
+            }
+
+        }*/
+
+
+        //handleMovement(p1, p2, clearPass);
+        //handleMovement(p2, p1, clearPass);
 
         if (p1.getRoom() == currentLevel)
         {
@@ -529,8 +354,8 @@ bool Game::riddle_answers(Riddle r, Player& p)
 void Game::resetGame()
 {
     currentLevel = 0;
-    screen = Screen(levels[currentLevel]);
-    current_riddle = Screen(riddles_chars[currentLevel]);
+    //screen = Screen(levels[currentLevel]);
+    //current_riddle = Screen(riddles_chars[currentLevel]);
     press_switches = 0;
     p1.setPoint(1, 1, Direction::directions[Direction::STAY]);
     p1.setInventory('E');
@@ -653,11 +478,71 @@ void Game::handleMovement(Player& p, Player& other, bool clearPass) //handling t
         }
     }
 }
+void Game::boom(Circle c,Screen& screen)
+{
+    int startX = max(0, c.getCenter().getX() - c.getRadius());
+    int endX = min(Screen::MAX_X - 4, c.getCenter().getX() + c.getRadius());
 
+    int startY = max(0, c.getCenter().getY() - c.getRadius());
+    int endY = min(Screen::MAX_Y - 4, c.getCenter().getY() + c.getRadius());
+
+
+    Point pc = c.getCenter();
+    for(int i=startY;i<=endY;i++)
+    {
+        for (int j = startX; j <=endX; j++)
+        {
+            Point p(j, i);
+           
+            if(pc.distance(p)<=c.getRadius())
+            {
+                if(!screen.antiBoom(p))
+                {
+                    if (screen.isPlayer(p))
+                    {
+                        if(p==p1.getPoint())
+                        {
+                            p1.setLifePoints(p1.getlifePoint() - 1);
+                        }
+                        else if(p == p2.getPoint())
+                        {
+                            p2.setLifePoints(p2.getlifePoint() - 1);
+                        }
+                    }
+                    else
+                    {
+                        screen.setChar(p, ' ');
+
+                    }
+                 
+                }
+               
+            }
+        }
+    }
+}
+bool Game::fileToArray(const std::string& filename,
+    char dest[Screen::MAX_Y][Screen::MAX_X])
+{
+    Screen temp(filename);
+    const char (*p)[Screen::MAX_X] = temp.getScreen();
+
+    for (int y = 0; y < Screen::MAX_Y; ++y)
+        for (int x = 0; x < Screen::MAX_X; ++x)
+            dest[y][x] = p[y][x];
+
+    return true;
+}
+
+bool Game::fileToLevel(const std::string& filename, Screen& target)
+{
+    target = Screen(filename);
+    return true;
+}
 void Game::handleInteraction(Player& p, Point point, char drop_key_press) //handleing interactions after movement
 {
     char currentTile = p.getStepChar();
-	Point prev_p = p.getPoint();
+
 
     if (screen.isPlatform_on(point) || screen.isPlatform_off(point))
     {
@@ -672,38 +557,46 @@ void Game::handleInteraction(Player& p, Point point, char drop_key_press) //hand
             return;
         }
     }
-    if (drop_key_press != 0 && !p.get_justpicked() && (&p == &p1 && drop_key_press == 'e') || (&p == &p2 && drop_key_press == 'o'))
+    if (drop_key_press != 0 && (&p == &p1 && drop_key_press == 'e') || (&p == &p2 && drop_key_press == 'o'))
     {
         char itemInHand = p.getinventory();
         if (p.isFullInventory())
         {
             if (p.getinventory() == '@')
             {
-				Point bombCenter = p.getPoint();
-				Direction d = p.getdirection();
-				bombCenter.changeDir(d);
-                for (int i = 0; i < 4; i++)
-                {
-                    Point next = bombCenter;
-					next.move();
-                    if(screen.isWall(next))
-						break;
-					bombCenter = next;  
-                }
-                Circle c = { 2, prev_p };
-				p.drop_item(p1.getPoint(), screen);
-				boom(c, screen);
+               
+                    Point bombCenter = p.getPoint();
+                    Direction d = p.getdirection();
+                    bombCenter.changeDir(d);
+                    for (int i = 0; i < 4; i++)
+                    {
+                        Point next = bombCenter;
+                        next.move();
+
+
+                        if (screen.isWall(next))
+                            break;
+
+                        bombCenter = next;
+                    }
+
+                    Circle c = { 2, bombCenter };
+                    p.drop_item(bombCenter, screen);
+                    Sleep(1000);
+                    boom(c, screen);
+                    p.setInventory('E');
+                
 
             }
-            p.drop_item(p.getPoint(), screen);
-            p.setStepChar(itemInHand);
+            else
+            {
+                p.drop_item(p.getPoint(), screen);
+                p.setStepChar(itemInHand);
+            }
         }
     }
     p.set_justpicked(false);
 }
-
-
-
 Spring* Game::getSpringAt(const Point& p) //find the spring at point p
 {
     std::vector<Spring>& levelSprings = screen.getSprings();
@@ -716,10 +609,6 @@ Spring* Game::getSpringAt(const Point& p) //find the spring at point p
     }
     return nullptr;
 }
-
-
-
-
 Direction Game::check_Spring_direction(Spring* spring)
 {
 
@@ -735,8 +624,6 @@ Direction Game::check_Spring_direction(Spring* spring)
     return Direction::directions[Direction::STAY];
 
 }
-
-
 bool Game::match_directions(Spring* spring, Player& p) //checking if player direction matches spring release direction
 {
     spring->setReleaseDir(check_Spring_direction(spring));//setting the spring release direction according to its position in the level
@@ -755,8 +642,6 @@ bool Game::compressed(Player& p, Spring* spring)
     }
     return false;
 }
-
-
 bool Game::executeRiddle(Player& p)
 {
     bool wrong = true;
@@ -784,7 +669,6 @@ bool Game::executeRiddle(Player& p)
     }
     return false; // the player is dead and the game is over
 }
-
 void Game::handle_flying_movement(Player& p, Player& other, bool canPass, char key)//the situation after spring release 
 {
     p.setDirection(p.getBoostDir());
@@ -811,7 +695,6 @@ void Game::handle_flying_movement(Player& p, Player& other, bool canPass, char k
         p.resetBoost();
     }
 }
-
 void Game::release_spring(Player& p, Spring* spring, Screen& screen)//setting the ground for the player boost after spring release, and creating the spring release
 {
     int speed, game_cycles;
@@ -845,8 +728,6 @@ void Game::release_spring(Player& p, Spring* spring, Screen& screen)//setting th
     spring->setcurrentCompressed(0);
 
 }
-
-
 void Game::handle_pre_spring_movement(Player& p, Player& other, bool canPass) //regular movement handling before spring interaction
 {
 
@@ -903,3 +784,4 @@ void Game::handle_pre_spring_movement(Player& p, Player& other, bool canPass) //
         handleMovement(p, other, canPass);
     }
 }
+

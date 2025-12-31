@@ -2,6 +2,8 @@
 #include "Point.h"
 #include "utils.h"
 #include "Screen.h"
+#include <cmath>
+
 
 void Point::draw(char c) {
 	gotoxy(x, y);
@@ -24,4 +26,10 @@ Point Point::next() const
 	int nx = x + dir.dirx;
 	int ny = y + dir.diry;
 	return Point(nx, ny, dir, ch);
+}
+double Point::distance(Point p)//returns the distance of two points
+{
+	int y = this->getY() - p.getY();
+	int x = this->getX() - p.getX();
+	return sqrt((x * x) + (y * y));
 }
