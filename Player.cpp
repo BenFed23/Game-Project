@@ -18,31 +18,6 @@ void Player::keyPressed(char ch)
 		++index;
 	}
 }
-/*bool Player::move_player_(Screen& screen, bool clearPass, char& stepchar)
-{
-	Point old_location = point;
-	Point next_location = point;
-	next_location.move();
-	stepchar = screen.charAt(next_location);
-	point.move();
-
-
-	if (screen.isWall(point) || (screen.isDoor(point) && !clearPass))
-	{
-		point = old_location;
-		point.changeDir(Direction::directions[Direction::STAY]);
-		point.draw();
-		return false;
-	}
-	old_location.draw(screen.charAt(old_location));
-	pick_item(screen);
-	point.draw();
-	return true;
-}*/
-
-
-
-
 
 bool Player::move_player_(Screen& screen, bool canMove, char nextStepChar)
 {
@@ -62,13 +37,6 @@ bool Player::move_player_(Screen& screen, bool canMove, char nextStepChar)
 
 	return true;
 }
-
-
-
-
-
-
-
 
 char Player::getItem()
 {
@@ -107,4 +75,38 @@ void Player::pick_item(Screen& screen, char itemToPick)
 void Player::draw_player()
 {
 	point.draw();
+}
+void Player::resetBoost() //after boost ends
+{
+	boostFramesLeft = 0;
+	boostSpeed = 0;
+	power = 1;
+}
+
+void Player::startLaunch(int speed, int duration, const Direction& dir) //when spring is activated
+{
+	this->boostSpeed = speed;
+	this->boostFramesLeft = duration;
+	this->Boost_dir = dir;
+
+}
+
+bool Player::isPlayerKey(char ch) const
+{
+	for (char key : movekeys)
+	{
+		if (std::tolower(key) == std::tolower(ch))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void Player::reduceBoost()
+{
+	if (boostFramesLeft > 0)
+	{
+		boostFramesLeft--;
+	}
 }

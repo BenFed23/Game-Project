@@ -42,20 +42,36 @@ void Game::run() {
     char key = 0;
     bool running = true;
     bool clearPass;
+    p1canpass = false;
+    p2canpass = false;
     bool solved_Riddle = false;
+    bool wrong;
+    isGameOver = false;
     hideCursor();
     cls();
-
+    Player* lastPlayerToExit = nullptr;
     screen.drawRoom();
-    bool wrong;
+  
 
-    while (running) {
-        if (_kbhit()) {
+    while ((running)&&(!isGameOver))
+    {
+
+        if (p1.getRoom() != currentLevel && p2.getRoom() != currentLevel && lastPlayerToExit != nullptr)
+        {
+            moveLevel(lastPlayerToExit->getRoom());
+            current_riddle = Screen(riddles_chars[currentLevel]);
+            solved_Riddle = false;
+            lastPlayerToExit = nullptr;
+        }
+        if (_kbhit())
+        {
             key = _getch();
-            if (key == ESC) {
+            if (key == ESC) 
+            {
                 bool result = pauseMenu();
                 if (result) return; 
-                else {
+                else 
+                {
                     cls();
                     screen.drawRoom();
                     key = 0;
@@ -63,31 +79,38 @@ void Game::run() {
                 }
             }
 
-            if (tolower(key) == 'e' && p1.getinventory()=='K') {
+            /*if (tolower(key) == 'e' && p1.getinventory() == 'K') {
                 char itemInHand1 = p1.getinventory();
                 p1.drop_item(p1.getPoint(), screen);
                 p1.setStepChar(itemInHand1);
                 continue;
-            }
+            }*/
 
             
-            if (tolower(key) == 'o' && p2.getinventory()=='K') {
+            /*if (tolower(key) == 'o' && p2.getinventory() == 'K') {
                 char itemInHand2 = p2.getinventory();
                 p2.drop_item(p2.getPoint(), screen);
                 p2.setStepChar(itemInHand2);
                 continue;
-            }
-           
-
-            p1.keyPressed(key);
-            p2.keyPressed(key);
+            }*/
+            if (p1.getRoom() == currentLevel) //if player1 is in the room, the keys are available
+                p1.keyPressed(key);
+            if (p2.getRoom() == currentLevel) //if player2 is in the room, the keys are available
+                p2.keyPressed(key);
+            
         }
 
-        clearPass = switchesOn(screen) && ((p1.getinventory() == 'K') || (p2.getinventory() == 'K')) && solved_Riddle;
+        bool envReady = solved_Riddle && switchesOn(screen);
+
+        //clearPass = switchesOn(screen) && ((p1.getinventory() == 'K') || (p2.getinventory() == 'K')) && solved_Riddle;
+
+        p1canpass = envReady && (p1.getinventory() == 'K');
+        p2canpass = envReady && (p2.getinventory() == 'K');
+
 
         Point prev_p1 = p1.getPoint();
         Point prev_p2 = p2.getPoint();
-        if (tolower(key) == 'e' && p1.getinventory() == '@')
+      /*  if (tolower(key) == 'e' && p1.getinventory() == '@')
         {
             if (p1.getdirection() == Direction::directions[Direction::STAY])
             {
@@ -136,12 +159,14 @@ void Game::run() {
                 boom(c, screen);
             }
 
-        }
-        handleMovement(p1, p2, clearPass);
-        handleMovement(p2, p1, clearPass);
+        }*/
+
+
+        //handleMovement(p1, p2, clearPass);
+        //handleMovement(p2, p1, clearPass);
 
        
-        if (!(p1.getPoint() == prev_p1)) {
+        /*if (!(p1.getPoint() == prev_p1)) {
             if (screen.isPlatform_on(prev_p1) || screen.isPlatform_off(prev_p1)) {
                 on_or_off_switch(prev_p1, screen);
             }
@@ -182,15 +207,69 @@ void Game::run() {
             screen.setChar(p2.getPoint(), ' ');
             p2.setStepChar(' ');
             cls(); screen.drawRoom(); p1.draw_player(); p2.draw_player();
+        }*/
+        if (p1.getRoom() == currentLevel)
+        {
+            if (p1.isInBoost())
+            {
+                handle_flying_movement(p1, p2, p1canpass, key);
+            }
+            else
+            {
+                handleInteraction(p1, prev_p1, key);
+                if (isGameOver)
+                    break;
+                handle_pre_spring_movement(p1, p2, p1canpass);
+
+
+                if (enterRoom(p1))
+                {
+                    lastPlayerToExit = &p1;
+                    gotoxy(prev_p1.getX(), prev_p1.getY()); std::cout << ' ';
+                    p1.setInventory('E');
+                }
+
+            }
+        }
+        if (p2.getRoom() == currentLevel)
+        {
+            if (p2.isInBoost())
+            {
+                handle_flying_movement(p2, p1, p2canpass, key);
+            }
+            else
+            {
+                handleInteraction(p2, prev_p2, key);
+                if (isGameOver)
+                    break;
+                handle_pre_spring_movement(p2, p1, p2canpass);
+
+
+                if (enterRoom(p2))
+                {
+                    lastPlayerToExit = &p2;
+                    gotoxy(prev_p2.getX(), prev_p2.getY()); std::cout << ' ';
+                    p2.setInventory('E');
+                }
+            }
         }
 
+        if (p1.getRoom() == currentLevel && !screen.isDoor(p1.getPoint()))
+        {
+            p1.draw_player();
+        }
+
+        if (p2.getRoom() == currentLevel && !screen.isDoor(p2.getPoint()))
+        {
+            p2.draw_player();
+        }
         screen.drawStatus(p1, p2);
 
-        if ((screen.isDoor(p1.getPoint()) || screen.isDoor(p2.getPoint())) && clearPass) {
+        /*if ((screen.isDoor(p1.getPoint()) || screen.isDoor(p2.getPoint())) && clearPass) {
             if (currentLevel + 1 < NUMLEVELS) enterRoom();
             else { running = false; break; }
-        }
-
+        }*/
+        key = 0;
         Sleep(100);
     }
 }
@@ -258,16 +337,33 @@ bool Game::switchesOn(Screen& screen) {
     return press_switches == screen.get_switch_counters();
 }
 
-void Game::enterRoom() {
-    if (switchesOn(screen)) {
-        if ((p1.getinventory() == 'K') || (p2.getinventory() == 'K')) {
-            p1.drop_item(p1.getPoint(), screen);
-            cls();
-            moveLevel(currentLevel + 1);
-            current_riddle = Screen(riddles_chars[currentLevel]);
-            screen.drawRoom();
+bool Game::enterRoom(Player& p)
+{
+    Point pos = p.getPoint();
+    char target = screen.charAt(pos);
+
+    if (screen.isDoor(pos))
+    {
+        gotoxy(pos.getX(), pos.getY());
+        std::cout << target;
+
+
+        int nextRoomIndex = target - '0';
+        p.setRoom(nextRoomIndex);
+
+        if (&p == &p1)
+        {
+            p.setPoint(levelStarts[nextRoomIndex].p1_x, levelStarts[nextRoomIndex].p1_y, Direction::directions[Direction::STAY]);
         }
+        else
+        {
+            p.setPoint(levelStarts[nextRoomIndex].p2_x, levelStarts[nextRoomIndex].p2_y, Direction::directions[Direction::STAY]);
+        }
+        p.setPower(1);
+        return true;
+
     }
+    return false;
 }
 
 bool Game::riddle_answers(Riddle r, Player& p) {
@@ -284,8 +380,8 @@ bool Game::riddle_answers(Riddle r, Player& p) {
 
 void Game::resetGame() {
     currentLevel = 0;
-    screen = Screen(levels[currentLevel]);
-    current_riddle = Screen(riddles_chars[currentLevel]);
+    //screen = Screen(levels[currentLevel]);
+    //current_riddle = Screen(riddles_chars[currentLevel]);
     press_switches = 0;
     p1.setPoint(1, 1, Direction::directions[Direction::STAY]);
     p2.setPoint(2, 2, Direction::directions[Direction::STAY]);
@@ -338,44 +434,61 @@ void Game::stopPower(Player& p1, Player& p2) {
     p2.setPower(1);
 }
 
-void Game::handleMovement(Player& p, Player& other, bool clearPass) {
+void Game::handleMovement(Player& p, Player& other, bool clearPass) //handling the movement of player p, considering other player and if can pass doors
+{
     Point nextPos = p.getPoint().next();
     char target = screen.charAt(nextPos);
     bool canMove = true;
     char charToStepOn = ' ';
+    char ch = p.getStepChar();
+
 
     if (screen.isWall(nextPos))
     {
         canMove = false;
     }
-    else if (screen.isDoor(nextPos) && !clearPass) {
+    else if (screen.isDoor(nextPos) && !clearPass)
+    {
         canMove = false;
     }
-    else if (target == '*') {
+
+    else if (target == '*')
+    {
         Point otherNext = other.getPoint().next();
-        if (nextPos == otherNext) {
+        if (nextPos == otherNext)
+        {
             int dxP = p.getdirection().getdirx();
             int dyP = p.getdirection().getdiry();
             int dxO = other.getdirection().getdirx();
             int dyO = other.getdirection().getdiry();
             if ((dxP == -dxO && dxP != 0) || (dyP == -dyO && dyP != 0)) canMove = false;
         }
-        if (canMove) {
+        if (canMove)
+        {
             if (pushing_together(p, other, screen) || Push(screen, p)) charToStepOn = ' ';
             else canMove = false;
         }
     }
-    else {
+
+
+    else
+    {
         canMove = true;
         charToStepOn = target;
     }
 
-    if (p.move_player_(screen, canMove, charToStepOn)) {
-        char tile = p.getStepChar();
-        if (tile == 'K' || tile == '@' || tile == '!') {
-            if (!p.isFullInventory()) {
-                p.pick_item(screen, tile);
+    if (p.move_player_(screen, canMove, charToStepOn))
+    {
+        char step_char = p.getStepChar();
+        if (step_char == 'K' || step_char == '@' || step_char == '!')
+        {
+            if (!p.isFullInventory())
+            {
+                p.pick_item(screen, charToStepOn);
                 p.setStepChar(' ');
+
+
+                p.set_justpicked(true);
             }
         }
     }
@@ -440,5 +553,250 @@ bool Game::fileToLevel(const std::string& filename, Screen& target)
 {
     target = Screen(filename);
     return true;
+}
+void Game::handleInteraction(Player& p, Point point, char drop_key_press) //handleing interactions after movement
+{
+    char currentTile = p.getStepChar();
+
+
+    if (screen.isPlatform_on(point) || screen.isPlatform_off(point))
+    {
+        on_or_off_switch(point, screen);
+    }
+
+    if (currentTile == '?')
+    {
+        if (!executeRiddle(p))
+        {
+            this->isGameOver = true;
+            return;
+        }
+    }
+    if (drop_key_press != 0 && (&p == &p1 && drop_key_press == 'e') || (&p == &p2 && drop_key_press == 'o'))
+    {
+        char itemInHand = p.getinventory();
+        if (p.isFullInventory())
+        {
+            if (p.getinventory() == '@')
+            {
+               
+                    Point bombCenter = p.getPoint();
+                    Direction d = p.getdirection();
+                    bombCenter.changeDir(d);
+                    for (int i = 0; i < 4; i++)
+                    {
+                        Point next = bombCenter;
+                        next.move();
+
+
+                        if (screen.isWall(next))
+                            break;
+
+                        bombCenter = next;
+                    }
+
+                    Circle c = { 2, bombCenter };
+                    p.drop_item(bombCenter, screen);
+                    Sleep(1000);
+                    boom(c, screen);
+                    p.setInventory('E');
+                
+
+            }
+            else
+            {
+                p.drop_item(p.getPoint(), screen);
+                p.setStepChar(itemInHand);
+            }
+        }
+    }
+    p.set_justpicked(false);
+}
+Spring* Game::getSpringAt(const Point& p) //find the spring at point p
+{
+    std::vector<Spring>& levelSprings = screen.getSprings();
+    for (auto& spring : levelSprings) //moving through all springs in the level
+    {
+        if (spring.isPointOnSpring(p))
+        {
+            return &spring; //return the right spring
+        }
+    }
+    return nullptr;
+}
+Direction Game::check_Spring_direction(Spring* spring)
+{
+
+    const std::vector<Point>& locations = spring->getLocations();
+
+    for (const auto& pt : locations)
+    {
+        if (pt.getX() == 1)  return Direction::directions[Direction::RIGHT];
+        if (pt.getX() == 77) return Direction::directions[Direction::LEFT];
+        if (pt.getY() == 1)  return Direction::directions[Direction::DOWN];
+        if (pt.getY() == 19) return Direction::directions[Direction::UP];
+    }
+    return Direction::directions[Direction::STAY];
+
+}
+bool Game::match_directions(Spring* spring, Player& p) //checking if player direction matches spring release direction
+{
+    spring->setReleaseDir(check_Spring_direction(spring));//setting the spring release direction according to its position in the level
+    return spring->opposite(p.getdirection());//checking if the player is moving against the spring direction
+}
+
+bool Game::compressed(Player& p, Spring* spring)
+{
+    if (spring->compress())
+    {
+        p.getPoint().draw(' ');
+
+        p.setStepChar(' ');
+
+        return true;
+    }
+    return false;
+}
+bool Game::executeRiddle(Player& p)
+{
+    bool wrong = true;
+    p1.freeze();
+    p2.freeze();
+
+    while (p.getlifePoint() > 0 && wrong)
+    {
+        current_riddle.drawRoom();
+        screen.drawStatus(p1, p2);
+        wrong = riddle_answers(riddles[currentLevel], p);
+    }
+
+    if (p.getlifePoint() > 0)
+    {
+        solved_Riddle = true;
+        screen.setChar(p.getPoint(), ' ');
+        p.setStepChar(' ');
+        cls();
+        screen.drawRoom();
+        p1.draw_player();
+        p2.draw_player();
+        return true; //the riddle is solved
+
+    }
+    return false; // the player is dead and the game is over
+}
+void Game::handle_flying_movement(Player& p, Player& other, bool canPass, char key)//the situation after spring release 
+{
+    p.setDirection(p.getBoostDir());
+
+    for (int j = 0; j < p.get_boostSpeed(); j++)
+    {
+        Point nextPosP = p.getPoint().next();
+        Point prev_pos = p.getPoint();
+        handleMovement(p, other, canPass);
+
+        if (nextPosP == other.getPoint())
+        {
+            other.setDirection(p.getdirection());
+
+            handleMovement(other, p, true);
+        }
+        handleInteraction(p, prev_pos, key);
+    }
+
+    p.reduceBoost();
+
+    if (!p.isInBoost())
+    {
+        p.resetBoost();
+    }
+}
+void Game::release_spring(Player& p, Spring* spring, Screen& screen)//setting the ground for the player boost after spring release, and creating the spring release
+{
+    int speed, game_cycles;
+    spring->releaseSpring(speed, game_cycles);
+
+    Direction boostDir = spring->getReleaseDir();
+
+    p.startLaunch(speed, game_cycles, boostDir);
+    p.setPower(1 + speed);
+    p.setDirection(boostDir);
+
+    for (int j = 0; j < speed; j++)
+    {
+        if (&p == &p1)
+        {
+            handleMovement(p1, p2, p1canpass);
+        }
+        else
+        {
+            handleMovement(p2, p1, p2canpass);
+        }
+    }
+
+    for (const auto& pt : spring->getLocations())
+    {
+        screen.setChar(pt, '#');
+        gotoxy(pt.getX(), pt.getY());
+        std::cout << '#';
+    }
+    p.draw_player();
+    spring->setcurrentCompressed(0);
+
+}
+void Game::handle_pre_spring_movement(Player& p, Player& other, bool canPass) //regular movement handling before spring interaction
+{
+
+
+    Point currentPos = p.getPoint();
+    Point nextPos = currentPos.next();
+
+    Spring* s = getSpringAt(nextPos);
+    if (s == nullptr) s = getSpringAt(currentPos);
+
+    if (s != nullptr)
+    {
+        bool isCompressingKey = match_directions(s, p);
+
+        if (isCompressingKey)
+        {
+            if (!s->isFullyCompressed())
+            {
+                if (compressed(p, s))
+                {
+                    p.draw_player();
+                    Sleep(20);
+
+                    handleMovement(p, other, canPass);
+                }
+            }
+            else
+            {
+                release_spring(p, s, screen);
+            }
+        }
+        else
+        {
+            int current_charge = s->getcurrentCompressed();
+            if (current_charge > 0)
+            {
+                if (!(s->opposite(p.getdirection())))
+                {
+                    release_spring(p, s, screen);
+                }
+                else
+                {
+                    handleMovement(p, other, canPass);
+                }
+            }
+            else
+            {
+                handleMovement(p, other, canPass);
+            }
+        }
+    }
+    else
+    {
+        handleMovement(p, other, canPass);
+    }
 }
 

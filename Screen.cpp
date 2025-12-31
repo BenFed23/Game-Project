@@ -9,7 +9,7 @@ Screen::Screen()
 {
     memset(level, ' ', sizeof(level));
 }
-Screen::Screen(const char input[MAX_Y][MAX_X])
+/*Screen::Screen(const char input[MAX_Y][MAX_X])
 {
     for (int y = 0; y < MAX_Y; y++) {
         for (int x = 0; x < MAX_X; x++) {
@@ -23,6 +23,8 @@ Screen::Screen(const char input[MAX_Y][MAX_X])
     }
 
 }
+*/
+
 
 void Screen::drawRoom() const {
     for (int y = 0; y < MAX_Y; y++) {
@@ -154,6 +156,45 @@ bool Screen::isDoor(const Point& p) const
     }
     return true;
 }
+std::vector<Point> Screen::getSpringVector(Point startPoint) //creating the spring vector
+{
+    std::vector<Point> springPoints;
+    std::vector<Point> toCheck;
+
+    if (charAt(startPoint) != '#') return springPoints;
+
+    toCheck.push_back(startPoint);
+    springPoints.push_back(startPoint);
+
+    int head = 0;
+
+    while (head < toCheck.size())
+    {
+        Point current = toCheck[head++];
+        int dx[] = { 0, 0, 1, -1 };
+        int dy[] = { 1, -1, 0, 0 };
+
+        for (int i = 0; i < 4; i++)
+        {
+            int nextX = current.getX() + dx[i];
+            int nextY = current.getY() + dy[i];
+
+            if (nextX >= 0 && nextX < MAX_X && nextY >= 0 && nextY < MAX_Y)
+            {
+                if (level[nextY][nextX] == '#')
+                {
+                    if (!isPointInVector(springPoints, nextX, nextY))
+                    {
+                        Point neighbor(nextX, nextY, Direction::directions[Direction::STAY], '#');
+                        springPoints.push_back(neighbor);
+                        toCheck.push_back(neighbor);
+                    }
+                }
+            }
+        }
+    }
+    return springPoints;
+}
 bool Screen::loadefile(const std::string& filename)
 {
     std::ifstream file(filename);
@@ -178,5 +219,53 @@ bool Screen::loadefile(const std::string& filename)
     }
     return true;
 }
+// Screen.cpp
+void Screen::buildSprings()
+{
+    springs.clear();
+
+    for (int y = 0; y < MAX_Y; y++)
+    {
+        for (int x = 0; x < MAX_X; x++)
+        {
+            if (level[y][x] != '#') continue;
+
+            bool alreadyInSpring = false;
+            for (const auto& s : springs)
+            {
+                if (s.isPointOnSpring(Point(x, y)))
+                {
+                    alreadyInSpring = true;
+                    break;
+                }
+            }
+            if (alreadyInSpring) continue;
+
+            std::vector<Point> springPoints = getSpringVector(Point(x, y));
+
+            Direction dir = Direction::directions[Direction::LEFT];
+            if (x == 1) dir = Direction::directions[Direction::RIGHT];
+            else if (x == MAX_X - 2) dir = Direction::directions[Direction::LEFT];
+            else if (y == MAX_Y - 2) dir = Direction::directions[Direction::UP];
+
+            springs.emplace_back(springPoints, dir, '#');
+        }
+    }
+}
+
+
+void Screen::debugPrintSpringDir(const Spring& s) const
+{
+    const Direction& d = s.getReleaseDir();
+
+    gotoxy(0, MAX_Y + 1); // שורה מתחת למסך
+    std::cout << "[SPRING DIR] "
+        << "dx=" << d.getdirx()
+        << " dy=" << d.getdiry()
+        << "      " << std::flush;
+}
+
+
+
 
 
