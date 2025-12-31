@@ -16,13 +16,15 @@ Game::Game() : currentLevel(0), p1('$', 1, 1, "wdxas", 'e'), p2('&', 2, 2, "ilmj
     fileToLevel("adv-world_menu.screen", gameMenu);
     fileToLevel("pause.screen", pauseScreen);
     fileToLevel("adv-world_indructions.screen", instructions);
-    std::vector<std::string> levelFiles = {
+    std::vector<std::string> levelFiles = 
+    {
     "adv-world_01.screen",
     "adv-world_02.screen",
     "adv-world_03.screen"
     };
 
-    std::vector<std::string> riddleFiles = {
+    std::vector<std::string> riddleFiles = 
+    {
         "adv-world_01.riddle",
         "adv-world_02.riddle"
     };
@@ -93,61 +95,7 @@ void Game::run()
 
         Point prev_p1 = p1.getPoint();
         Point prev_p2 = p2.getPoint();
-      /*  if (tolower(key) == 'e' && p1.getinventory() == '@')
-        {
-            if (p1.getdirection() == Direction::directions[Direction::STAY])
-            {
-                Point bombCenter = p1.getPoint();
-                Direction d = p1.getdirection();
-                bombCenter.changeDir(d);
-                for (int i = 0; i < 4; i++)
-                {
-                    Point next = bombCenter;
-                    next.move();
-
-
-                    if (screen.isWall(next))
-                        break;
-
-                    bombCenter = next;
-                }
-
-                Circle  c = { 2,prev_p1 };
-                p1.drop_item(p1.getPoint(), screen);
-                boom(c, screen);
-            }
-               
-        }
-        if (tolower(key) == 'o' && p2.getinventory() == '@')
-        {
-            if (p2.getdirection() == Direction::directions[Direction::STAY])
-            {
-                Point bombCenter = p1.getPoint();
-                Direction d = p1.getdirection();
-                bombCenter.changeDir(d);
-                for (int i = 0; i < 4; i++)   
-                {
-                    Point next = bombCenter;
-                    next.move();
-
-                   
-                    if (screen.isWall(next))
-                        break;
-
-                    bombCenter = next;
-                }
-
-                Circle  c = { 3,prev_p1 };
-                p2.drop_item(p2.getPoint(), screen);
-                boom(c, screen);
-            }
-
-        }*/
-
-
-        //handleMovement(p1, p2, clearPass);
-        //handleMovement(p2, p1, clearPass);
-
+     
         if (p1.getRoom() == currentLevel)
         {
             if (p1.isInBoost())

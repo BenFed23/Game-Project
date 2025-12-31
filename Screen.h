@@ -26,7 +26,6 @@ private:
 public:
 	Screen();
 	Screen(const char input[MAX_Y][MAX_X]);
-	//Screen(const char input[MAX_Y][MAX_X]);
 	Screen(const std::string& filename)
 	{
 		memset(level, ' ', sizeof(level));
