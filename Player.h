@@ -21,7 +21,7 @@ class Player
 	char symbol = 'P';
 
 	int player_room_level = 0;
-	char symbol = 'P';
+
 public:
 
 	void keyPressed(char ch);
@@ -95,10 +95,6 @@ public:
 		return justpicked;
 	}
 
-	void setInventory(char item)
-	{
-		inventory = item;
-	}
 	int getPower() const
 	{
 		return power;

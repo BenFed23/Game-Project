@@ -34,20 +34,11 @@ class Game
 	bool p2canpass = false;
 	bool isGameOver = false;
 public:
-	struct StartPositions {
-		int p1_x, p1_y;
-		int p2_x, p2_y;
-	};
-
-	StartPositions levelStarts[NUMLEVELS] =
-	{
-		{2, 13, 2, 2},   //level1
-		{5, 5, 20, 5},  //level2
-		{2, 18, 70, 18} //level3
-	};
+	
 	Game();
 
-	struct StartPositions {
+	struct StartPositions 
+	{
 		int p1_x, p1_y;
 		int p2_x, p2_y;
 	};

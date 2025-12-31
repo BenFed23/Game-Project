@@ -190,46 +190,6 @@ std::vector<Point> Screen::getObstacleVector(Point startPoint) //creating the ob
     return obstaclePoints;
 }
 
-std::vector<Point> Screen::getSpringVector(Point startPoint) //creating the spring vector
-{
-    std::vector<Point> springPoints;
-    std::vector<Point> toCheck;
-
-    if (charAt(startPoint) != '#') return springPoints;
-
-    toCheck.push_back(startPoint);
-    springPoints.push_back(startPoint);
-
-    int head = 0;
-
-    while (head < toCheck.size())
-    {
-        Point current = toCheck[head++];
-        int dx[] = { 0, 0, 1, -1 };
-        int dy[] = { 1, -1, 0, 0 };
-
-        for (int i = 0; i < 4; i++)
-        {
-            int nextX = current.getX() + dx[i];
-            int nextY = current.getY() + dy[i];
-
-            if (nextX >= 0 && nextX < MAX_X && nextY >= 0 && nextY < MAX_Y)
-            {
-                if (level[nextY][nextX] == '#')
-                {
-                    if (!isPointInVector(springPoints, nextX, nextY))
-                    {
-                        Point neighbor(nextX, nextY, Direction::directions[Direction::STAY], '#');
-                        springPoints.push_back(neighbor);
-                        toCheck.push_back(neighbor);
-                    }
-                }
-            }
-        }
-    }
-    return springPoints;
-}
-
 bool Screen::isPointPartOfObstacle(const std::vector<Point>& obstacle, const Point& p) const  //covering the function isPointInVector to get it outside the class
 {
     return isPointInVector(obstacle, p.getX(), p.getY());

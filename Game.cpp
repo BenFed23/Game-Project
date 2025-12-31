@@ -54,7 +54,6 @@ void Game::run()
     Player* lastPlayerToExit = nullptr; // Track the last player who exited the room
     screen.drawRoom();
     //screen.debugShowAllSprings();
-    bool wrong;
     isGameOver = false;
 
     while (running && !isGameOver)

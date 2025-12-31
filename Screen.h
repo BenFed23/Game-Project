@@ -22,10 +22,10 @@ private:
 
 	bool isPointInVector(const std::vector<Point>& vec, int x, int y) const;
 
-	std::vector<Spring> springs;
 
 public:
 	Screen();
+	Screen(const char input[MAX_Y][MAX_X]);
 	//Screen(const char input[MAX_Y][MAX_X]);
 	Screen(const std::string& filename)
 	{
@@ -47,11 +47,6 @@ public:
 			return true;
 		}
 		return false;
-	}
-
-	std::vector<Spring>& getSprings()
-	{
-		return springs;
 	}
 
 	bool isBomb(const Point& p) const
@@ -76,7 +71,7 @@ public:
 
 	}
 	
-	 char (*getScreen() )[MAX_X]
+	char (*getScreen())[MAX_X] //TODO: check if this works
 	{
 		return level;
 	}
