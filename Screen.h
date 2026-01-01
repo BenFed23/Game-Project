@@ -19,6 +19,7 @@ private:
 	char level[MAX_Y][MAX_X];
 	int SwitchCounters = 0;
 	std::vector<Spring>springs;
+	Point legendPos; //position of the legend in the screen
 
 	bool isPointInVector(const std::vector<Point>& vec, int x, int y) const;
 
@@ -39,14 +40,7 @@ public:
 	{
 		return level[p.getY()][p.getX()];
 	}
-	bool isPlayer(const Point& p)
-	{
-		if(((charAt(p))=='$')||((charAt(p)) == '&'))
-		{
-			return true;
-		}
-		return false;
-	}
+	bool isPlayer(const Point& p);
 
 	bool isBomb(const Point& p) const
 	{

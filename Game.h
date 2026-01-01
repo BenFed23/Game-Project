@@ -9,7 +9,7 @@
 
 class Game
 {
-
+	int game_Cycles = 0;
 	bool isDark = false;
 	static const int NUMLEVELS = 3;
 	Screen screen;

@@ -99,7 +99,8 @@ void Screen::clearItem(const Point& p)
     std::cout << ' ';
 }
 
-void Screen::drawStatus(const Player& p1, const Player& p2) const {
+void Screen::drawStatus(const Player& p1, const Player& p2) const 
+{
     int baseRow = Screen::MAX_Y - 4;
 
 
@@ -251,6 +252,7 @@ std::vector<Point> Screen::getSpringVector(Point startPoint) //creating the spri
     }
     return springPoints;
 }
+
 bool Screen::loadefile(const std::string& filename)
 {
     std::ifstream file(filename);
@@ -275,7 +277,7 @@ bool Screen::loadefile(const std::string& filename)
     }
     return true;
 }
-// Screen.cpp
+
 void Screen::buildSprings()
 {
     springs.clear();
@@ -321,7 +323,14 @@ void Screen::debugPrintSpringDir(const Spring& s) const
         << "      " << std::flush;
 }
 
-
+bool Screen::isPlayer(const Point& p)
+{
+    if (((charAt(p)) == '$') || ((charAt(p)) == '&'))
+    {
+        return true;
+    }
+    return false;
+}
 
 
 

@@ -14,7 +14,7 @@ Game::Game() : currentLevel(0), p1('$', 1, 1, "wdxas", 'e'), p2('&', 2, 2, "ilmj
 
     
     fileToLevel("adv-world_menu.screen", gameMenu);
-    fileToLevel("pause.screen", pauseScreen);
+    fileToLevel("adv-world_pause.screen", pauseScreen);
     fileToLevel("adv-world_indructions.screen", instructions);
     std::vector<std::string> levelFiles = 
     {
@@ -42,13 +42,14 @@ Game::Game() : currentLevel(0), p1('$', 1, 1, "wdxas", 'e'), p2('&', 2, 2, "ilmj
 
 void Game::run()
 {
+	game_Cycles = 0;
     constexpr char ESC = 27;
     char key = 0;
     bool running = true;
     bool clearPass;
     p1canpass = false;
     p2canpass = false;
-    bool solved_Riddle = false;
+    solved_Riddle = false;
     bool wrong;
     isGameOver = false;
     hideCursor();
@@ -60,6 +61,7 @@ void Game::run()
 
     while (running && !isGameOver)
     {
+        
         if (p1.getRoom() != currentLevel && p2.getRoom() != currentLevel && lastPlayerToExit != nullptr)
         {
             moveLevel(lastPlayerToExit->getRoom());
@@ -89,8 +91,8 @@ void Game::run()
         }
 
         bool envReady = solved_Riddle && switchesOn(screen);
-
-        p1canpass = envReady && (p1.getinventory() == 'K');
+        
+        p1canpass = envReady;
         p2canpass = envReady && (p2.getinventory() == 'K');
 
         Point prev_p1 = p1.getPoint();
@@ -114,7 +116,10 @@ void Game::run()
                 {
                     lastPlayerToExit = &p1;
                     gotoxy(prev_p1.getX(), prev_p1.getY()); std::cout << ' ';
-                    p1.setInventory('E');
+                    if (p1.getinventory() == 'K')
+                    {
+                        p1.setInventory('E');
+                    }
                 }
 
             }
@@ -137,7 +142,10 @@ void Game::run()
                 {
                     lastPlayerToExit = &p2;
                     gotoxy(prev_p2.getX(), prev_p2.getY()); std::cout << ' ';
-                    p2.setInventory('E');
+                    if (p2.getinventory() == 'K')
+                    {
+                        p2.setInventory('E');
+                    }
                 }
             }
         }
@@ -154,7 +162,7 @@ void Game::run()
 
         screen.drawStatus(p1, p2);
 
-
+		game_Cycles++;
         key = 0;
         Sleep(100);
     }
@@ -274,7 +282,9 @@ bool Game::riddle_answers(Riddle r, Player& p)
     {
         gotoxy(18, 18);
         std::cout << "RIGHT ANSWER! GOOD JOB";
-        Sleep(2000);
+		solved_Riddle = true;
+        Sleep(1500);
+
         return false;
     }
     else
@@ -284,14 +294,14 @@ bool Game::riddle_answers(Riddle r, Player& p)
         {
             gotoxy(17, 18);
             std::cout << "Wrong answer! Life points left: " << p.getlifePoint();
-            Sleep(2000);
+            Sleep(1500);
             return true;
         }
         else
         {
             gotoxy(17, 18);
             std::cout << "WRONG ANSWER, GAME OVER!!!!!!!!";
-			Sleep(2000);
+			Sleep(1500);
 			return true;
         }
     
@@ -468,8 +478,7 @@ void Game::boom(Circle c,Screen& screen)
         }
     }
 }
-bool Game::fileToArray(const std::string& filename,
-    char dest[Screen::MAX_Y][Screen::MAX_X])
+bool Game::fileToArray(const std::string& filename, char dest[Screen::MAX_Y][Screen::MAX_X])
 {
     Screen temp(filename);
     const char (*p)[Screen::MAX_X] = temp.getScreen();
@@ -521,17 +530,28 @@ void Game::handleInteraction(Player& p, Point point, char drop_key_press) //hand
                         next.move();
 
 
-                        if (screen.isWall(next))
+                        if (screen.isWall(next) || (screen.isObstacle(next)) || screen.isSpring(next))
                             break;
+                        gotoxy(bombCenter.getX(), bombCenter.getY());
+                        std::cout << '@';
+
+                        p1.draw_player();
+                        p2.draw_player();
+
+
+                        gotoxy(bombCenter.getX(), bombCenter.getY());
+                        std::cout << ' ';
 
                         bombCenter = next;
                     }
 
-                    Circle c = { 2, bombCenter };
-                    p.drop_item(bombCenter, screen);
-                    Sleep(1000);
+                    Circle c = { 4, bombCenter };
+					bombCenter.draw('@');
+					Sleep(200); 
                     boom(c, screen);
+                    bombCenter.draw(' ');
                     p.setInventory('E');
+                   
                 
 
             }
