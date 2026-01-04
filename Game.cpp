@@ -6,6 +6,7 @@
 #include <iostream>
 #include "Riddle.h"
 #include "Circle.h"
+using namespace std;
 
 
 Game::Game() : currentLevel(0), p1('$', 1, 1, "wdxas", 'e'), p2('&', 2, 2, "ilmjk", 'o')
@@ -34,7 +35,7 @@ Game::Game() : currentLevel(0), p1('$', 1, 1, "wdxas", 'e'), p2('&', 2, 2, "ilmj
     for (size_t i = 0; i < riddleFiles.size(); ++i)
         fileToArray(riddleFiles[i], riddles_chars[i]);
     screen = Screen(levels[currentLevel]);
-    current_riddle = Screen(riddles_chars[currentLevel]);
+    current_riddle = Screen(riddles_chars[currentLevel], false, true);
     press_switches = 0;
     riddles[0] = Riddle('D');
     riddles[1] = Riddle('C');
@@ -55,17 +56,19 @@ void Game::run()
     hideCursor();
     cls();
     Player* lastPlayerToExit = nullptr; // Track the last player who exited the room
+	moveLevel(0);
     screen.drawRoom();
     //screen.debugShowAllSprings();
-    isGameOver = false;
 
     while (running && !isGameOver)
     {
         
+
         if (p1.getRoom() != currentLevel && p2.getRoom() != currentLevel && lastPlayerToExit != nullptr)
         {
             moveLevel(lastPlayerToExit->getRoom());
-            current_riddle = Screen(riddles_chars[currentLevel]);
+            if (isGameOver) break;
+            current_riddle = Screen(riddles_chars[currentLevel], false, true);
             solved_Riddle = false;
             lastPlayerToExit = nullptr;
         }
@@ -171,7 +174,88 @@ void Game::run()
 void Game::moveLevel(int index)
 {
     currentLevel = index;
-    screen = Screen(levels[index]);
+    try
+    {
+        screen = Screen(levels[index]);
+        Point legendPos = screen.getLegendPos();
+        int legendPos_Y = legendPos.getY(); 
+
+        if (legendPos_Y > 1 && legendPos_Y <= 20)
+        {
+            cls();
+            gotoxy(20, 8);
+            cerr << "Warning: Legend in center! Objects in this area were removed." << endl;
+			gotoxy(20, 10);
+            cerr << "This might make the level unplayable due to deleted items." << endl;
+			gotoxy(20, 13); 
+            cout << "Press 1 to continue with Legend in center." << endl;
+			gotoxy(20, 15);
+			cout << "Press 2 to move Legend automatically to bottom." << endl;
+            char choice = _getch();
+            if (choice == '2') 
+            {
+                screen = Screen(levels[index], false);
+
+                screen.setLegendPos(Point(0, 21)); //moving the legend to the bottom
+
+
+            }
+            else  if (choice == '1')//then we adjust players position
+            {
+                adjust_player_positions_acc_to_L(legendPos_Y);
+            }
+        }
+        else if(legendPos_Y > 21) //legend is already at the bottom
+        {
+            gotoxy(20, 12);
+            cerr << "Warning: Legend is too low! unable to play the game." << endl;
+            gotoxy(20, 15);
+            cout << "\npress 2 to Move Legend automatically to bottom. else - you must change the location of the legend to play." << endl;
+            char choice = _getch();
+            if (choice == '2')
+            {
+                screen = Screen(levels[index], false);
+
+                screen.setLegendPos(Point(0, 21)); //moving the legend to the bottom
+
+
+            }
+			else //then we end the game and go to main menu
+            {
+				this->isGameOver = true;
+				return;
+            }
+        }
+        else if (legendPos_Y == 1) //legend is at the top
+        {
+            gotoxy(20, 9);
+            cerr << "Warning: Legend is at the top. items might be deleted." << endl;
+            gotoxy(20, 12);
+            cout << "press 1 to keep the legend at the top." << endl;
+            gotoxy(20, 13);
+            cout << "press 2 to Move Legend automatically to bottom." << endl;
+            char choice = _getch();
+            if (choice == '2')
+            {
+                screen = Screen(levels[index], false);
+            }
+            else if (choice == '1')
+            {
+                adjust_player_positions_acc_to_L(legendPos_Y);
+			}
+		}
+        else 
+        {
+            adjust_player_positions_acc_to_L(legendPos_Y);
+		}
+    }
+    catch (...)
+    {
+        cerr << "Problem loading level " << index << endl;
+    }
+    if(isGameOver)
+		return;
+       
     cls();
     screen.drawRoom();
     press_switches = 0;
@@ -484,8 +568,13 @@ bool Game::fileToArray(const std::string& filename, char dest[Screen::MAX_Y][Scr
     const char (*p)[Screen::MAX_X] = temp.getScreen();
 
     for (int y = 0; y < Screen::MAX_Y; ++y)
+    {
         for (int x = 0; x < Screen::MAX_X; ++x)
+        {
             dest[y][x] = p[y][x];
+            
+        }
+    }
 
     return true;
 }
@@ -611,6 +700,10 @@ bool Game::compressed(Player& p, Spring* spring)
 }
 bool Game::executeRiddle(Player& p)
 {
+	Point original_legendPos = screen.getLegendPos();
+    
+	current_riddle.setLegendPos(Point(0,22));
+	screen.setLegendPos(Point(0, 21));
     bool wrong = true;
     p1.freeze();
     p2.freeze();
@@ -627,6 +720,7 @@ bool Game::executeRiddle(Player& p)
         solved_Riddle = true;
         screen.setChar(p.getPoint(), ' ');
         p.setStepChar(' ');
+        screen.setLegendPos(original_legendPos);
         cls();
         screen.drawRoom();
         p1.draw_player();
@@ -634,6 +728,7 @@ bool Game::executeRiddle(Player& p)
         return true; //the riddle is solved
 
     }
+
     return false; // the player is dead and the game is over
 }
 void Game::handle_flying_movement(Player& p, Player& other, bool canPass, char key)//the situation after spring release 
@@ -752,3 +847,17 @@ void Game::handle_pre_spring_movement(Player& p, Player& other, bool canPass) //
     }
 }
 
+void Game::adjust_player_positions_acc_to_L(int legendPos_Y)
+{
+    if (p1.getPoint().getY() >= legendPos_Y - 1 && p1.getPoint().getY() <= legendPos_Y + 3)
+    {
+        p1.setPoint(p1.getPoint().getX(), legendPos_Y + 4, Direction::directions[Direction::STAY]);
+        p1.setStepChar(' ');
+    }
+
+    if (p2.getPoint().getY() >= legendPos_Y - 1 && p2.getPoint().getY() <= legendPos_Y + 3)
+    {
+        p2.setPoint(p2.getPoint().getX(), legendPos_Y + 4, Direction::directions[Direction::STAY]);
+        p2.setStepChar(' ');
+    }
+}

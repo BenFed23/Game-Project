@@ -14,7 +14,7 @@ Screen::Screen()
 {
     memset(level, ' ', sizeof(level));
 }
-Screen::Screen(const char input[MAX_Y][MAX_X])
+Screen::Screen(const char input[MAX_Y][MAX_X], bool createBottom , bool is_riddle)
 {
 
     for (int y = 0; y < MAX_Y; y++)
@@ -26,10 +26,55 @@ Screen::Screen(const char input[MAX_Y][MAX_X])
             {
                 SwitchCounters++;
             }
+            if (level[y][x] == 'L' && !is_riddle)
+            {
+                this->setLegendPos(Point(x, y));
+                level[y][x] = ' ';
+            }
 
         }
 
     }
+
+    int legendY = this->getLegendPos().getY();
+    if (createBottom)
+    {
+        if (legendY >= 1 && legendY < 21)
+        {
+            for (int i = legendY - 1; i <= legendY + 3; i++)
+            {
+                for (int j = 15; j <= 63; j++)
+                {
+                    if (i >= 0 && i < MAX_Y && j >= 0 && j < MAX_X)
+                    {
+                        if (i == legendY - 1 || i == legendY + 3 || j == 15 || j == 63)
+                        {
+                            level[i][j] = 'W';
+                        }
+                        else
+                        {
+                            level[i][j] = ' ';
+                        }
+                    }
+                }
+            }
+        }
+
+
+    }
+    if (!createBottom || legendY == 21)
+    {
+        this->setLegendPos(Point(0, 21));
+		legendY = 21;
+        
+        for (int j = 0; j < MAX_X - 1; j++)
+        {
+            level[legendY - 1][j] = 'W';
+        }
+    }
+
+    
+
     for (int y = 0; y < MAX_Y; y++)
     {
         for (int x = 0; x < MAX_X; x++)
@@ -101,14 +146,57 @@ void Screen::clearItem(const Point& p)
 
 void Screen::drawStatus(const Player& p1, const Player& p2) const 
 {
-    int baseRow = Screen::MAX_Y - 4;
+    //int baseRow = Screen::MAX_Y - 4;
 
 
-    gotoxy(0, baseRow);
+
+
+	Point legendPos = this->getLegendPos();
+	int legendPos_X = legendPos.getX();
+	int legendPos_Y = legendPos.getY();
+
+	
+    if (legendPos_Y == 21)
+    {
+        gotoxy(2, legendPos_Y);
+        std::cout << "P1 Life: " << p1.getlifePoint();
+        gotoxy(2, legendPos_Y + 1);
+        std::cout << "Inventory: " << p1.getinventory();
+        gotoxy(2, legendPos_Y + 2);
+        std::cout << "Power: " << p1.getPower();
+
+        gotoxy(65, legendPos_Y);
+        std::cout << "P2 Life: " << p2.getlifePoint();
+        gotoxy(65, legendPos_Y + 1);
+        std::cout << "Inventory: " << p2.getinventory();
+        gotoxy(65, legendPos_Y + 2);
+        std::cout << "Power: " << p2.getPower();
+	}
+    else
+    {
+        gotoxy(17, legendPos_Y);
+        std::cout << "P1 Life: " << p1.getlifePoint();
+        gotoxy(17, legendPos_Y + 1);
+        std::cout << "Inventory: " << p1.getinventory();
+        gotoxy(17, legendPos_Y + 2);
+        std::cout << "Power: " << p1.getPower();
+
+        gotoxy(50, legendPos_Y);
+        std::cout << "P2 Life: " << p2.getlifePoint();
+        gotoxy(50, legendPos_Y + 1);
+        std::cout << "Inventory: " << p2.getinventory();
+        gotoxy(50, legendPos_Y + 2);
+        std::cout << "Power: " << p2.getPower();
+    }
+
+
+
+
+   /* gotoxy(2, baseRow);
     std::cout << "Player1 Life: " << p1.getlifePoint();
-    gotoxy(0, baseRow + 1);
+    gotoxy(2, baseRow + 1);
     std::cout << "Inventory: " << p1.getinventory();
-    gotoxy(0, baseRow + 2);
+    gotoxy(2, baseRow + 2);
     std::cout << "Power: " << p1.getPower();
 
 
@@ -120,14 +208,14 @@ void Screen::drawStatus(const Player& p1, const Player& p2) const
     int colRightInv = Screen::MAX_X - p2Inv.length();
     int colRightPw = Screen::MAX_X - p2Pw.length();
 
-    gotoxy(colRightLife, baseRow);
+    gotoxy(colRightLife - 3, baseRow);
     std::cout << p2Life;
-    gotoxy(colRightInv, baseRow + 1);
+    gotoxy(colRightInv - 3, baseRow + 1);
     std::cout << p2Inv;
-    gotoxy(colRightPw, baseRow + 2);
+    gotoxy(colRightPw - 3, baseRow + 2);
     std::cout << p2Pw;
 
-    std::cout << std::flush;
+    std::cout << std::flush;*/
 }
 
 

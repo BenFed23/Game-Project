@@ -74,4 +74,5 @@ public:
 	bool executeRiddle(Player& p);
 	void handle_flying_movement(Player& p, Player& other, bool canPass, char key);
 	void handle_pre_spring_movement(Player& p, Player& other, bool canPass);
+	void adjust_player_positions_acc_to_L(int legendPos_Y);
 };

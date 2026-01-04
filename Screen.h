@@ -26,7 +26,7 @@ private:
 
 public:
 	Screen();
-	Screen(const char input[MAX_Y][MAX_X]);
+	Screen(const char input[MAX_Y][MAX_X], bool createBottom = true, bool is_riddle = false);
 	Screen(const std::string& filename)
 	{
 		memset(level, ' ', sizeof(level));
@@ -119,5 +119,13 @@ public:
 	{
 		return springs;
 	}
+	const Point& getLegendPos() const
+	{ 
+		return legendPos; 
+	}
 	
+	void setLegendPos(Point newlegend_pos) 
+	{
+		legendPos = newlegend_pos;
+	}
 };
