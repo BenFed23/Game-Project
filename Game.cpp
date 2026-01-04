@@ -523,7 +523,7 @@ void Game::handleMovement(Player& p, Player& other, bool clearPass) //handling t
         }
     }
 }
-void Game::boom(Circle c,Screen& screen)
+/*void Game::boom(Circle c, Screen& screen)
 {
     int startX = max(0, c.getCenter().getX() - c.getRadius());
     int endX = min(Screen::MAX_X - 4, c.getCenter().getX() + c.getRadius());
@@ -533,7 +533,7 @@ void Game::boom(Circle c,Screen& screen)
 
 
     Point pc = c.getCenter();
-    for(int i=startY;i<=endY;i++)
+    for (int i=startY;i<=endY;i++)
     {
         for (int j = startX; j <=endX; j++)
         {
@@ -543,17 +543,16 @@ void Game::boom(Circle c,Screen& screen)
             {
                 if(!screen.antiBoom(p))
                 {
-                    if (screen.isPlayer(p))
+                    if (c.inRange(p) && p == p1.getPoint())
                     {
-                        if(p==p1.getPoint())
-                        {
+                    
                             p1.setLifePoints(p1.getlifePoint() - 1);
-                        }
-                        else if(p == p2.getPoint())
-                        {
-                            p2.setLifePoints(p2.getlifePoint() - 1);
-                        }
                     }
+                    else if(c.inRange(p) && p == p2.getPoint())
+                    {
+                            p2.setLifePoints(p2.getlifePoint() - 1);
+                    }
+                    
                     else
                     {
                         screen.setChar(p, ' ');
@@ -565,6 +564,44 @@ void Game::boom(Circle c,Screen& screen)
             }
         }
     }
+}*/
+void Game::boom(Circle c, Screen& screen)
+{
+    int startX = max(0, c.getCenter().getX() - (int)c.getRadius());
+    int endX = min(Screen::MAX_X - 1, c.getCenter().getX() + (int)c.getRadius());
+    int startY = max(0, c.getCenter().getY() - (int)c.getRadius());
+    int endY = min(Screen::MAX_Y - 1, c.getCenter().getY() + (int)c.getRadius());
+
+    for (int i = startY; i <= endY; i++)
+    {
+        for (int j = startX; j <= endX; j++)
+        {
+            Point p(j, i);
+
+            if (c.inRange(p))
+            {
+                if (p == p1.getPoint())
+                {
+                    p1.setLifePoints(p1.getlifePoint() - 1);
+                }
+                if (p == p2.getPoint())
+                {
+                    p2.setLifePoints(p2.getlifePoint() - 1);
+                }
+
+                if (!screen.antiBoom(p))
+                {
+                    screen.setChar(p, ' ');
+
+                    gotoxy(p.getX(), p.getY());
+                    std::cout << ' ';
+                }
+            }
+        }
+    }
+    // בסוף הפיצוץ, נצייר מחדש את השחקנים למקרה שהם בחיים והתו תחתיהם נמחק
+    p1.draw_player();
+    p2.draw_player();
 }
 bool Game::fileToArray(const std::string& filename, char dest[Screen::MAX_Y][Screen::MAX_X])
 {

@@ -93,14 +93,8 @@ public:
 	{
 		return SwitchCounters;
 	}
-	bool antiBoom(const Point& p)
-	{
-		if ((charAt(p) == 'W') || (charAt(p) == 'K') || ((charAt(p) == '@')) || ((charAt(p) == '!')) || ((charAt(p) == '#')))
-		{
-			return true;
-		}
-		return false;
-	}
+	bool antiBoom(const Point& p);
+	
 	void clearItem(const Point& p);
 	void drawRoom() const;
 	void drawStatus(const Player& p1, const Player& p2) const;
@@ -112,7 +106,6 @@ public:
 	
 
 
-	void debugPrintSpringDir(const Spring& s) const;
 
 
 	std::vector<Spring>& getSprings()

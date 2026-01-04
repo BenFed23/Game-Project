@@ -399,18 +399,6 @@ void Screen::buildSprings()
     }
 }
 
-
-void Screen::debugPrintSpringDir(const Spring& s) const
-{
-    const Direction& d = s.getReleaseDir();
-
-    gotoxy(0, MAX_Y + 1); // שורה מתחת למסך
-    std::cout << "[SPRING DIR] "
-        << "dx=" << d.getdirx()
-        << " dy=" << d.getdiry()
-        << "      " << std::flush;
-}
-
 bool Screen::isPlayer(const Point& p)
 {
     if (((charAt(p)) == '$') || ((charAt(p)) == '&'))
@@ -420,5 +408,13 @@ bool Screen::isPlayer(const Point& p)
     return false;
 }
 
+bool Screen::antiBoom(const Point& p)
+{
+    if ((charAt(p) == 'W') || (charAt(p) == 'K' || ((charAt(p) == '@')) || ((charAt(p) == '!')) || ((charAt(p) == '#')) || charAt(p) == '?'))
+    {
+        return true;
+    }
+    return false;
+}
 
 
