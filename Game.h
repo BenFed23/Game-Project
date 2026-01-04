@@ -6,6 +6,7 @@
 #include "Circle.h"
 #include<string>
 #include "Spring.h"
+#include "BOMB.h"
 
 class Game
 {
@@ -33,6 +34,11 @@ class Game
 	bool p1canpass = false;
 	bool p2canpass = false;
 	bool isGameOver = false;
+	BOMB* p1_activeBomb = nullptr;
+	BOMB* p2_activeBomb = nullptr;
+
+
+
 public:
 	
 	Game();
@@ -75,4 +81,5 @@ public:
 	void handle_flying_movement(Player& p, Player& other, bool canPass, char key);
 	void handle_pre_spring_movement(Player& p, Player& other, bool canPass);
 	void adjust_player_positions_acc_to_L(int legendPos_Y);
+	void Bomb_explosion_logic(BOMB*& activeBomb);
 };

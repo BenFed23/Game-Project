@@ -100,7 +100,8 @@ void Game::run()
 
         Point prev_p1 = p1.getPoint();
         Point prev_p2 = p2.getPoint();
-     
+
+		
         if (p1.getRoom() == currentLevel)
         {
             if (p1.isInBoost())
@@ -152,6 +153,9 @@ void Game::run()
                 }
             }
         }
+        Bomb_explosion_logic(p1_activeBomb);
+        Bomb_explosion_logic(p2_activeBomb);
+
 
         if (p1.getRoom() == currentLevel && !screen.isDoor(p1.getPoint()))
         {
@@ -618,12 +622,10 @@ void Game::handleInteraction(Player& p, Point point, char drop_key_press) //hand
                         Point next = bombCenter;
                         next.move();
 
-
                         if (screen.isWall(next) || (screen.isObstacle(next)) || screen.isSpring(next))
                             break;
                         gotoxy(bombCenter.getX(), bombCenter.getY());
                         std::cout << '@';
-
                         p1.draw_player();
                         p2.draw_player();
 
@@ -634,12 +636,21 @@ void Game::handleInteraction(Player& p, Point point, char drop_key_press) //hand
                         bombCenter = next;
                     }
 
-                    Circle c = { 4, bombCenter };
-					bombCenter.draw('@');
-					Sleep(200); 
+                    if (&p == &p1)
+                    {
+						p1.setInventory('E');
+                        p1_activeBomb = new BOMB(bombCenter);
+                    }
+                    else
+                    {
+                        p2.setInventory('E');
+						p2_activeBomb = new BOMB(bombCenter);
+                    }
+                    /*Circle c = {4, bombCenter};
                     boom(c, screen);
                     bombCenter.draw(' ');
                     p.setInventory('E');
+                    */
                    
                 
 
@@ -859,5 +870,34 @@ void Game::adjust_player_positions_acc_to_L(int legendPos_Y)
     {
         p2.setPoint(p2.getPoint().getX(), legendPos_Y + 4, Direction::directions[Direction::STAY]);
         p2.setStepChar(' ');
+    }
+}
+
+
+void Game::Bomb_explosion_logic(BOMB*& activeBomb) //handling the bomb logic for player p
+{
+    if (activeBomb == nullptr) return; 
+
+	if (activeBomb->update()) //the function that reduces the timer and returns true if the bomb is still active
+    {
+        int timeLeft = activeBomb->getTimer();
+        Point pos = activeBomb->getPos();
+
+        if (timeLeft > 0) 
+        {
+            gotoxy(pos.getX(), pos.getY());
+            std::cout << timeLeft;
+        }
+        else 
+        {
+
+            boom(activeBomb->getCircle(), screen); //BANGGGGGGGGGG
+
+            gotoxy(pos.getX(), pos.getY());
+            std::cout << ' ';
+
+			delete activeBomb; // Free the memory
+            activeBomb = nullptr;
+        }
     }
 }
