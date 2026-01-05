@@ -248,6 +248,25 @@ void Game::moveLevel(int index)
                 adjust_player_positions_acc_to_L(legendPos_Y);
 			}
 		}
+        else if (legendPos_Y == 0)
+        {
+            gotoxy(20, 9);
+            cerr << "Warning: Legend is outside game borders." << endl;
+            gotoxy(20, 12);
+            cout << "press 1 to return to main menu and then change the L location." << endl;
+            gotoxy(20, 13);
+            cout << "press 2 to Move Legend automatically to bottom." << endl;
+            char choice = _getch();
+            if (choice == '2')
+            {
+                screen = Screen(levels[index], false);
+            }
+            else if (choice == '1')
+            {
+                this->isGameOver = true;
+                return;
+            }
+        }
         else 
         {
             adjust_player_positions_acc_to_L(legendPos_Y);
