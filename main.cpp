@@ -5,5 +5,5 @@ int main()
 {
 	Game g;
 	g.Menu();
-
+	return 0;
 }

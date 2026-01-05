@@ -9,7 +9,7 @@ Screen::Screen()
 {
     memset(level, ' ', sizeof(level));
 }
-/*Screen::Screen(const char input[MAX_Y][MAX_X])
+Screen::Screen(const char input[MAX_Y][MAX_X])
 {
     for (int y = 0; y < MAX_Y; y++) {
         for (int x = 0; x < MAX_X; x++) {
@@ -23,7 +23,7 @@ Screen::Screen()
     }
 
 }
-*/
+
 
 
 void Screen::drawRoom() const {
@@ -148,14 +148,10 @@ void Screen::setChar(const Point& p, char ch)
 
 bool Screen::isDoor(const Point& p) const
 {
-    int num = charAt(p) - '0';
-
-    if ((num > 4) || (num < 1))
-    {
-        return false;
-    }
-    return true;
+    char c = charAt(p);
+    return (c >= '0' && c <= '9');
 }
+
 std::vector<Point> Screen::getSpringVector(Point startPoint) //creating the spring vector
 {
     std::vector<Point> springPoints;
@@ -253,17 +249,6 @@ void Screen::buildSprings()
     }
 }
 
-
-void Screen::debugPrintSpringDir(const Spring& s) const
-{
-    const Direction& d = s.getReleaseDir();
-
-    gotoxy(0, MAX_Y + 1); // שורה מתחת למסך
-    std::cout << "[SPRING DIR] "
-        << "dx=" << d.getdirx()
-        << " dy=" << d.getdiry()
-        << "      " << std::flush;
-}
 
 
 

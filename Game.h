@@ -9,7 +9,9 @@
 
 class Game
 {
-
+public:
+	static constexpr int TORCH_RADIUS = 8;
+private:
 	bool isDark = false;
 	static const int NUMLEVELS = 3;
 	Screen screen;
@@ -19,7 +21,8 @@ class Game
 	Screen pauseScreen;
 	Player p1;
 	Player p2;
-	char levels[NUMLEVELS][Screen::MAX_Y][Screen::MAX_X];
+	std::vector<Screen> savedlevels;
+	//char levels[NUMLEVELS][Screen::MAX_Y][Screen::MAX_X];
 	char riddles_chars[NUMLEVELS][Screen::MAX_Y][Screen::MAX_X];
 	int press_switches = 0;
 	int currentLevel;
@@ -33,6 +36,8 @@ class Game
 	bool p1canpass = false;
 	bool p2canpass = false;
 	bool isGameOver = false;
+	std::vector<int> pressSwitches;
+	std::vector<bool> levelUnlocked;
 public:
 	struct StartPositions {
 		int p1_x, p1_y;
@@ -71,4 +76,6 @@ public:
 	bool executeRiddle(Player& p);
 	void handle_flying_movement(Player& p, Player& other, bool canPass, char key);
 	void handle_pre_spring_movement(Player& p, Player& other, bool canPass);
+	void drawDarkRoom( Screen& s, Circle& light);
+	void drawCurrentRoom();
 };

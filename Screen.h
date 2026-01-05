@@ -19,19 +19,19 @@ private:
 	char level[MAX_Y][MAX_X];
 	int SwitchCounters = 0;
 	std::vector<Spring>springs;
+	bool darkmode=false;
 
 	bool isPointInVector(const std::vector<Point>& vec, int x, int y) const;
 
 
 public:
 	Screen();
-	//Screen(const char input[MAX_Y][MAX_X]);
+	Screen(const char input[MAX_Y][MAX_X]);
 	Screen(const std::string& filename)
 	{
 		memset(level, ' ', sizeof(level));
 		SwitchCounters = 0;
 		loadefile(filename); 
-		
 		buildSprings();
 	}
 
@@ -116,15 +116,16 @@ public:
 	bool loadefile(const std::string& filename);
 	void buildSprings();
 	std::vector<Point> getSpringVector(Point startPoint);
-	
-
-
-	void debugPrintSpringDir(const Spring& s) const;
-
-
 	std::vector<Spring>& getSprings()
 	{
 		return springs;
 	}
-	
+	bool isDarkRoom()
+	{
+		return darkmode;
+	}
+	void changeDarkMode(bool new_mode)
+	{
+		darkmode = new_mode;
+	}
 };

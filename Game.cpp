@@ -13,7 +13,7 @@ Game::Game() : currentLevel(0), p1('$', 10, 3, "wdxas", 'e'), p2('&', 10, 4, "il
 
     
     fileToLevel("adv-world_menu.screen", gameMenu);
-    fileToLevel("pause.screen", pauseScreen);
+    fileToLevel("adv-world_pause.screen", pauseScreen);
     fileToLevel("adv-world_indructions.screen", instructions);
     std::vector<std::string> levelFiles = {
     "adv-world_01.screen",
@@ -26,13 +26,20 @@ Game::Game() : currentLevel(0), p1('$', 10, 3, "wdxas", 'e'), p2('&', 10, 4, "il
         "adv-world_02.riddle"
     };
     for (size_t i = 0; i < levelFiles.size(); ++i)
-        fileToArray(levelFiles[i], levels[i]);
-
+    {
+        savedlevels.push_back(Screen(levelFiles[i]));
+        if(i==1)
+        {
+            savedlevels[i].changeDarkMode(true);
+        }
+        pressSwitches.push_back(0);
+        levelUnlocked.push_back(false);
+    }
     for (size_t i = 0; i < riddleFiles.size(); ++i)
         fileToArray(riddleFiles[i], riddles_chars[i]);
-    screen = Screen(levels[currentLevel]);
+    screen = savedlevels[0];
+    levelUnlocked[0] = true;
     current_riddle = Screen(riddles_chars[currentLevel]);
-    press_switches = 0;
     riddles[0] = Riddle('D');
     riddles[1] = Riddle('C');
 }
@@ -44,14 +51,13 @@ void Game::run() {
     bool clearPass;
     p1canpass = false;
     p2canpass = false;
-    bool solved_Riddle = false;
+    solved_Riddle = false;
     bool wrong;
     isGameOver = false;
     hideCursor();
     cls();
     Player* lastPlayerToExit = nullptr;
-    screen.drawRoom();
-  
+    drawCurrentRoom();
 
     while ((running)&&(!isGameOver))
     {
@@ -73,26 +79,13 @@ void Game::run() {
                 else 
                 {
                     cls();
-                    screen.drawRoom();
+                    drawCurrentRoom();
                     key = 0;
                     continue;
                 }
             }
 
-            /*if (tolower(key) == 'e' && p1.getinventory() == 'K') {
-                char itemInHand1 = p1.getinventory();
-                p1.drop_item(p1.getPoint(), screen);
-                p1.setStepChar(itemInHand1);
-                continue;
-            }*/
-
             
-            /*if (tolower(key) == 'o' && p2.getinventory() == 'K') {
-                char itemInHand2 = p2.getinventory();
-                p2.drop_item(p2.getPoint(), screen);
-                p2.setStepChar(itemInHand2);
-                continue;
-            }*/
             if (p1.getRoom() == currentLevel) //if player1 is in the room, the keys are available
                 p1.keyPressed(key);
             if (p2.getRoom() == currentLevel) //if player2 is in the room, the keys are available
@@ -101,113 +94,16 @@ void Game::run() {
         }
 
         bool envReady = solved_Riddle && switchesOn(screen);
+        bool hasKey= (p1.getinventory() == 'K') || (p2.getinventory() == 'K');
+       
 
-        //clearPass = switchesOn(screen) && ((p1.getinventory() == 'K') || (p2.getinventory() == 'K')) && solved_Riddle;
-
-        p1canpass = envReady && (p1.getinventory() == 'K');
-        p2canpass = envReady && (p2.getinventory() == 'K');
+        p1canpass = envReady&&hasKey;
+        p2canpass = envReady && hasKey;
 
 
         Point prev_p1 = p1.getPoint();
         Point prev_p2 = p2.getPoint();
-      /*  if (tolower(key) == 'e' && p1.getinventory() == '@')
-        {
-            if (p1.getdirection() == Direction::directions[Direction::STAY])
-            {
-                Point bombCenter = p1.getPoint();
-                Direction d = p1.getdirection();
-                bombCenter.changeDir(d);
-                for (int i = 0; i < 4; i++)
-                {
-                    Point next = bombCenter;
-                    next.move();
-
-
-                    if (screen.isWall(next))
-                        break;
-
-                    bombCenter = next;
-                }
-
-                Circle  c = { 2,prev_p1 };
-                p1.drop_item(p1.getPoint(), screen);
-                boom(c, screen);
-            }
-               
-        }
-        if (tolower(key) == 'o' && p2.getinventory() == '@')
-        {
-            if (p2.getdirection() == Direction::directions[Direction::STAY])
-            {
-                Point bombCenter = p1.getPoint();
-                Direction d = p1.getdirection();
-                bombCenter.changeDir(d);
-                for (int i = 0; i < 4; i++)   
-                {
-                    Point next = bombCenter;
-                    next.move();
-
-                   
-                    if (screen.isWall(next))
-                        break;
-
-                    bombCenter = next;
-                }
-
-                Circle  c = { 3,prev_p1 };
-                p2.drop_item(p2.getPoint(), screen);
-                boom(c, screen);
-            }
-
-        }*/
-
-
-        //handleMovement(p1, p2, clearPass);
-        //handleMovement(p2, p1, clearPass);
-
-       
-        /*if (!(p1.getPoint() == prev_p1)) {
-            if (screen.isPlatform_on(prev_p1) || screen.isPlatform_off(prev_p1)) {
-                on_or_off_switch(prev_p1, screen);
-            }
-        }
-        if (!(p2.getPoint() == prev_p2)) {
-            if (screen.isPlatform_on(prev_p2) || screen.isPlatform_off(prev_p2)) {
-                on_or_off_switch(prev_p2, screen);
-            }
-        }
-
-        
-        if (p1.getStepChar() == '?') {
-            wrong = true;
-            p1.freeze(); p2.freeze();
-            while (p1.getlifePoint() > 0 && wrong) {
-                cls();
-                current_riddle.drawRoom();
-                screen.drawStatus(p1, p2);
-                wrong = riddle_answers(riddles[currentLevel], p1);
-            }
-            if (p1.getlifePoint() == 0) return;
-            solved_Riddle = true;
-            screen.setChar(p1.getPoint(), ' ');
-            p1.setStepChar(' ');
-            cls(); screen.drawRoom(); p1.draw_player(); p2.draw_player();
-        }
-        if (p2.getStepChar() == '?') {
-            wrong = true;
-            p1.freeze(); p2.freeze();
-            while (p2.getlifePoint() > 0 && wrong) {
-                cls();
-                current_riddle.drawRoom();
-                screen.drawStatus(p1, p2);
-                wrong = riddle_answers(riddles[currentLevel], p2);
-            }
-            if (p2.getlifePoint() == 0) return;
-            solved_Riddle = true;
-            screen.setChar(p2.getPoint(), ' ');
-            p2.setStepChar(' ');
-            cls(); screen.drawRoom(); p1.draw_player(); p2.draw_player();
-        }*/
+     
         if (p1.getRoom() == currentLevel)
         {
             if (p1.isInBoost())
@@ -222,11 +118,28 @@ void Game::run() {
                 handle_pre_spring_movement(p1, p2, p1canpass);
 
 
-                if (enterRoom(p1))
+                /*if (enterRoom(p1))
                 {
                     lastPlayerToExit = &p1;
                     gotoxy(prev_p1.getX(), prev_p1.getY()); std::cout << ' ';
                     p1.setInventory('E');
+                }*/
+               
+
+                bool movedP1 = enterRoom(p1);
+
+               
+
+                if (movedP1)
+                {
+                    lastPlayerToExit = &p1;
+                    gotoxy(prev_p1.getX(), prev_p1.getY());
+                    std::cout << ' ';
+                    if(p1.getinventory()=='K')
+                    {
+                        p1.setInventory('E');
+                    }
+                   
                 }
 
             }
@@ -245,14 +158,25 @@ void Game::run() {
                 handle_pre_spring_movement(p2, p1, p2canpass);
 
 
-                if (enterRoom(p2))
+                bool movedP2 = enterRoom(p2);
+
+
+
+                if (movedP2)
                 {
                     lastPlayerToExit = &p2;
-                    gotoxy(prev_p2.getX(), prev_p2.getY()); std::cout << ' ';
-                    p2.setInventory('E');
+                    gotoxy(prev_p2.getX(), prev_p2.getY());
+                    std::cout << ' ';
+                    if (p2.getinventory() == 'K')
+                    {
+                        p2.setInventory('E');
+                    }
                 }
             }
         }
+      
+        //cls();
+        drawCurrentRoom();
 
         if (p1.getRoom() == currentLevel && !screen.isDoor(p1.getPoint()))
         {
@@ -265,23 +189,35 @@ void Game::run() {
         }
         screen.drawStatus(p1, p2);
 
-        /*if ((screen.isDoor(p1.getPoint()) || screen.isDoor(p2.getPoint())) && clearPass) {
-            if (currentLevel + 1 < NUMLEVELS) enterRoom();
-            else { running = false; break; }
-        }*/
+        
         key = 0;
         Sleep(100);
     }
 }
 
-void Game::moveLevel(int index) {
-    currentLevel = index;
-    screen = Screen(levels[index]);
+void Game::moveLevel(int new_level)
+{
+  
+    savedlevels[currentLevel] = screen;
+    pressSwitches[currentLevel] = press_switches;
+
+  
+    currentLevel = new_level;
+
+  
+    screen = savedlevels[currentLevel];
+    std::cout << "copied: saved=" << savedlevels[currentLevel].isDarkRoom()
+        << " screen=" << screen.isDarkRoom() << "\n";
+
+    press_switches = pressSwitches[currentLevel];
+
+  
     cls();
-    screen.drawRoom();
     p1.setPoint(2, 2, Direction::directions[Direction::STAY]);
     p2.setPoint(3, 3, Direction::directions[Direction::STAY]);
+    drawCurrentRoom();
 }
+
 
 void Game::Menu() {
     bool gameOver = false;
@@ -302,7 +238,8 @@ void Game::Menu() {
             break;
         case '9':
             cls();
-            return;
+            gameOver = true;
+            break;
         }
     }
 }
@@ -324,17 +261,17 @@ bool Game::pauseMenu() {
 void Game::on_or_off_switch(Point& p, Screen& s) {
     char currentContext = s.charAt(p);
     if (currentContext == '/') {
-        press_switches++;
+        pressSwitches[currentLevel]++;
         s.setChar(p, '\\');
     }
     else if (currentContext == '\\') {
-        press_switches--;
+        pressSwitches[currentLevel]--;
         s.setChar(p, '/');
     }
 }
 
 bool Game::switchesOn(Screen& screen) {
-    return press_switches == screen.get_switch_counters();
+    return   pressSwitches[currentLevel] == screen.get_switch_counters();
 }
 
 bool Game::enterRoom(Player& p)
@@ -359,6 +296,7 @@ bool Game::enterRoom(Player& p)
         {
             p.setPoint(levelStarts[nextRoomIndex].p2_x, levelStarts[nextRoomIndex].p2_y, Direction::directions[Direction::STAY]);
         }
+        levelUnlocked[currentLevel] = true;
         p.setPower(1);
         return true;
 
@@ -384,9 +322,17 @@ void Game::resetGame() {
     //current_riddle = Screen(riddles_chars[currentLevel]);
     press_switches = 0;
     p1.setPoint(1, 1, Direction::directions[Direction::STAY]);
+    p1.setInventory('E');
+    p1.setRoom(0);
+    p1.setPower(1);
+    p1.setStepChar(' ');
     p2.setPoint(2, 2, Direction::directions[Direction::STAY]);
     p1.setLifePoints(3);
     p2.setLifePoints(3);
+    p2.setInventory('E');
+    p2.setRoom(0);
+    p2.setPower(1);
+    p2.setStepChar(' ');
 }
 
 bool Game::Push(Screen& screen, Player& p, int bonus_power) {
@@ -447,10 +393,25 @@ void Game::handleMovement(Player& p, Player& other, bool clearPass) //handling t
     {
         canMove = false;
     }
-    else if (screen.isDoor(nextPos) && !clearPass)
+  
+    else if (screen.isDoor(nextPos))
     {
-        canMove = false;
+        int targetRoom = screen.charAt(nextPos) - '0';
+
+       
+        if (targetRoom < 0 || targetRoom >= (int)levelUnlocked.size())
+        {
+            canMove = false;
+        }
+        else if (targetRoom > currentLevel)
+        {
+            
+            if (!levelUnlocked[targetRoom] && !clearPass)
+                canMove = false;
+        }
+        
     }
+
 
     else if (target == '*')
     {
@@ -482,13 +443,20 @@ void Game::handleMovement(Player& p, Player& other, bool clearPass) //handling t
         char step_char = p.getStepChar();
         if (step_char == 'K' || step_char == '@' || step_char == '!')
         {
+            bool is_player2_has_key = false;
             if (!p.isFullInventory())
             {
+                if (p == p2 && step_char == 'K')
+                {
+                    is_player2_has_key = true;
+                }
+
                 p.pick_item(screen, charToStepOn);
                 p.setStepChar(' ');
 
 
                 p.set_justpicked(true);
+               
             }
         }
     }
@@ -579,7 +547,8 @@ void Game::handleInteraction(Player& p, Point point, char drop_key_press) //hand
         {
             if (p.getinventory() == '@')
             {
-               
+                if(p.getdirection()==Direction::directions[Direction::STAY])
+                {
                     Point bombCenter = p.getPoint();
                     Direction d = p.getdirection();
                     bombCenter.changeDir(d);
@@ -591,15 +560,21 @@ void Game::handleInteraction(Player& p, Point point, char drop_key_press) //hand
 
                         if (screen.isWall(next))
                             break;
+                        if (screen.isObstacle(next))
+                            std::cout << "boom activate";
 
                         bombCenter = next;
                     }
+                    bombCenter.setChar(' ');
+                    bombCenter.draw();
+                    Circle c = { 4, bombCenter };
+                    //p.drop_item(bombCenter, screen);
 
-                    Circle c = { 2, bombCenter };
-                    p.drop_item(bombCenter, screen);
-                    Sleep(1000);
                     boom(c, screen);
                     p.setInventory('E');
+                }
+               
+                    
                 
 
             }
@@ -799,4 +774,50 @@ void Game::handle_pre_spring_movement(Player& p, Player& other, bool canPass) //
         handleMovement(p, other, canPass);
     }
 }
+void Game::drawDarkRoom( Screen& s,  Circle& light)
+{
+    for (int y = 0; y < Screen::MAX_Y; y++)
+    {
+        gotoxy(0, y);
+
+        for (int x = 0; x < Screen::MAX_X; x++)
+        {
+
+            Point p(x, y);
+
+            if (light.inRange(p) ||(s.isDoor(p)))
+                std::cout << s.charAt(p);
+            else
+                p.draw();
+        }
+    }
+}
+void Game::drawCurrentRoom()
+{
+    if (screen.isDarkRoom())
+    {
+        
+        if (p1.getinventory() == '!')
+        {
+            Circle light(TORCH_RADIUS, p1.getPoint());
+            drawDarkRoom(screen, light);
+        }
+        else if (p2.getinventory() == '!')
+        {
+            Circle light(TORCH_RADIUS, p2.getPoint());
+            drawDarkRoom(screen, light);
+        }
+        else
+        {
+           
+        }
+    }
+    else
+    {
+        screen.drawRoom();
+    }
+}
+
+
+
 
