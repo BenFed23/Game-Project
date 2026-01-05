@@ -11,8 +11,10 @@ Spring::Spring(const std::vector<Point>& locs, Direction releasedir, char sym)
 {
     originalSize = (int)locs.size();
 
-    if (originalSize > 1) {
-        if (locations[0].getX() == locations[1].getX()) {
+    if (originalSize > 1) 
+    {
+        if (locations[0].getX() == locations[1].getX()) 
+        {
             releaseDir = Direction::directions[Direction::STAY];
         }
         else {

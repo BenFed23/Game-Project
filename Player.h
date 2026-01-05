@@ -2,6 +2,8 @@
 #include "Point.h"
 #include "items.h"
 #include "Direction.h"
+
+
 class Screen;
 class Player
 {
@@ -16,8 +18,10 @@ class Player
 	int boostFramesLeft = 0; //time remaining for boost
 	int boostSpeed = 0;
 	Direction Boost_dir = Direction::directions[Direction::STAY];
-	int player_room_level = 0;
 	char symbol = 'P';
+
+	int player_room_level = 0;
+
 public:
 
 	void keyPressed(char ch);
@@ -62,15 +66,7 @@ public:
 	{
 		return point.getDirection();
 	}
-	
-	void set_justpicked(bool is_picked)
-	{
-		justpicked = is_picked;;
-	}
-	bool get_justpicked() const
-	{
-		return justpicked;
-	}
+
 
 	void setInventory(char item)
 	{
@@ -85,7 +81,20 @@ public:
 	void draw_player();
 	bool isPlayerKey(char ch) const;
 	void reduceBoost();
+	void startLaunch(int speed, int duration, const Direction& dir);
+	void resetBoost();
+
 	bool justpicked;
+
+	void set_justpicked(bool is_picked)
+	{
+		justpicked = is_picked;;
+	}
+	bool get_justpicked() const
+	{
+		return justpicked;
+	}
+
 	int getPower() const
 	{
 		return power;
@@ -118,10 +127,7 @@ public:
 		return boostFramesLeft > 0;
 	}
 
-	void startLaunch(int speed, int duration, const Direction& dir);
-
-	void resetBoost();
-
+	
 	bool operator==(const Player& other) const
 	{
 		return (this->symbol == other.symbol);
