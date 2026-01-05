@@ -599,7 +599,6 @@ void Game::boom(Circle c, Screen& screen)
             }
         }
     }
-    // בסוף הפיצוץ, נצייר מחדש את השחקנים למקרה שהם בחיים והתו תחתיהם נמחק
     p1.draw_player();
     p2.draw_player();
 }

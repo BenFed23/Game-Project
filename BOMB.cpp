@@ -5,7 +5,7 @@
 bool BOMB::update()
 {
     internalCycles++;
-    if (internalCycles >= 2)
+    if (internalCycles >= 1)
     {
         timer--;
         internalCycles = 0;

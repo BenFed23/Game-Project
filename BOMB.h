@@ -10,7 +10,7 @@ class BOMB
 
 
 public:
-	BOMB(Point p, int r = 4) : bombCircle(r, p), timer(5), internalCycles(0) {}
+	BOMB(Point p, int r = 2) : bombCircle(r, p), timer(5), internalCycles(0) {}
 
 
     bool update(); //the time until explosion
