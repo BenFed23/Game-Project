@@ -6,12 +6,12 @@
 #include "Circle.h"
 #include<string>
 #include "Spring.h"
-#include "BOMB.h"
 
 class Game
 {
 public:
 	static constexpr int TORCH_RADIUS = 8;
+	static constexpr int Bomb_RADIUS = 3;
 private:
 	int game_Cycles = 0;
 	bool isDark = false;
@@ -24,9 +24,8 @@ private:
 	Player p1;
 	Player p2;
 	std::vector<Screen> savedlevels;
-	//char levels[NUMLEVELS][Screen::MAX_Y][Screen::MAX_X];
+	std::vector<Screen> originalLevels;
 	char riddles_chars[NUMLEVELS][Screen::MAX_Y][Screen::MAX_X];
-	int press_switches = 0;
 	int currentLevel;
 	Riddle riddles[NUMLEVELS - 1];
 	int visible_level = 1;
@@ -40,14 +39,23 @@ private:
 	bool isGameOver = false;
 	std::vector<int> pressSwitches;
 	std::vector<bool> levelUnlocked;
-	BOMB* p1_activeBomb = nullptr;
-	BOMB* p2_activeBomb = nullptr;
+	bool p1_activated_bomb = false;
+	bool p2_activated_bomb = false;
+	Circle bomb_explosion_p1 = Circle(Bomb_RADIUS, Point(0,0));
+	Circle bomb_explosion_p2 = Circle(Bomb_RADIUS, Point(0, 1));
+	int explode_at_p1 = -1;
+	int explode_at_p2 = -1;
+	bool initFailed = false;
+	std::string initErrorMsg;
 
 
+	
+	
 
 public:
 	
-	Game();
+	
+	Game() ;
 
 	struct StartPositions 
 	{
@@ -59,7 +67,7 @@ public:
 	{
 		{2, 13, 2, 2},   //level1
 		{5, 5, 20, 5},  //level2
-		{2, 18, 70, 18} //level3
+		{2, 2, 70, 18} //level3
 	};
 	void run();
 	void moveLevel(int index);
@@ -87,7 +95,10 @@ public:
 	void handle_flying_movement(Player& p, Player& other, bool canPass, char key);
 	void handle_pre_spring_movement(Player& p, Player& other, bool canPass);
 	void adjust_player_positions_acc_to_L(int legendPos_Y);
-	void Bomb_explosion_logic(BOMB*& activeBomb);
-	void drawDarkRoom( Screen& s, Circle& light);
+	void Bomb_explosion_logic(Circle& c, bool& activated_bomb, int& explode_at);
+	void drawDarkRoom(Screen& s, Circle& light);
 	void drawCurrentRoom();
+	bool check_validity_of_L(Screen& screen);
+	void showFatalInitErrorAndExit();
+
 };

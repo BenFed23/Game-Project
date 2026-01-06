@@ -3,7 +3,10 @@
 
 int main() 
 {
-	Game g;
-	g.Menu();
-	return 0;
+    Game g;
+
+    
+    g.Menu();
+
+   
 }
