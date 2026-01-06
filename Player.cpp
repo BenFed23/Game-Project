@@ -31,12 +31,15 @@ bool Player::move_player_(Screen& screen, bool canMove, char nextStepChar)
 
 	point.move();
 
+
+
 	this->stepchar = nextStepChar;
 
 	point.draw();
 
 	return true;
 }
+
 
 char Player::getItem()
 {

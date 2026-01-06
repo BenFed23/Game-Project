@@ -1,6 +1,7 @@
 #pragma once
 
-class Direction {
+class Direction 
+{
 	int dirx, diry;
 	friend class Point;
 public:

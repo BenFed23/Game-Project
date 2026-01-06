@@ -6,12 +6,14 @@
 #include "Circle.h"
 #include<string>
 #include "Spring.h"
+#include "BOMB.h"
 
 class Game
 {
 public:
 	static constexpr int TORCH_RADIUS = 8;
 private:
+	int game_Cycles = 0;
 	bool isDark = false;
 	static const int NUMLEVELS = 3;
 	Screen screen;
@@ -38,8 +40,17 @@ private:
 	bool isGameOver = false;
 	std::vector<int> pressSwitches;
 	std::vector<bool> levelUnlocked;
+	BOMB* p1_activeBomb = nullptr;
+	BOMB* p2_activeBomb = nullptr;
+
+
+
 public:
-	struct StartPositions {
+	
+	Game();
+
+	struct StartPositions 
+	{
 		int p1_x, p1_y;
 		int p2_x, p2_y;
 	};
@@ -50,7 +61,6 @@ public:
 		{5, 5, 20, 5},  //level2
 		{2, 18, 70, 18} //level3
 	};
-	Game();
 	void run();
 	void moveLevel(int index);
 	void Menu();
@@ -76,6 +86,8 @@ public:
 	bool executeRiddle(Player& p);
 	void handle_flying_movement(Player& p, Player& other, bool canPass, char key);
 	void handle_pre_spring_movement(Player& p, Player& other, bool canPass);
+	void adjust_player_positions_acc_to_L(int legendPos_Y);
+	void Bomb_explosion_logic(BOMB*& activeBomb);
 	void drawDarkRoom( Screen& s, Circle& light);
 	void drawCurrentRoom();
 };

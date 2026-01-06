@@ -6,8 +6,10 @@
 #include <iostream>
 #include "Riddle.h"
 #include "Circle.h"
+using namespace std;
 
-Game::Game() : currentLevel(0), p1('$', 10, 3, "wdxas", 'e'), p2('&', 10, 4, "ilmjk", 'o')
+
+Game::Game() : currentLevel(0), p1('$', 1, 1, "wdxas", 'e'), p2('&', 2, 2, "ilmjk", 'o')
 {
   
 
@@ -15,13 +17,15 @@ Game::Game() : currentLevel(0), p1('$', 10, 3, "wdxas", 'e'), p2('&', 10, 4, "il
     fileToLevel("adv-world_menu.screen", gameMenu);
     fileToLevel("adv-world_pause.screen", pauseScreen);
     fileToLevel("adv-world_indructions.screen", instructions);
-    std::vector<std::string> levelFiles = {
+    std::vector<std::string> levelFiles = 
+    {
     "adv-world_01.screen",
     "adv-world_02.screen",
     "adv-world_03.screen"
     };
 
-    std::vector<std::string> riddleFiles = {
+    std::vector<std::string> riddleFiles = 
+    {
         "adv-world_01.riddle",
         "adv-world_02.riddle"
     };
@@ -44,7 +48,9 @@ Game::Game() : currentLevel(0), p1('$', 10, 3, "wdxas", 'e'), p2('&', 10, 4, "il
     riddles[1] = Riddle('C');
 }
 
-void Game::run() {
+void Game::run()
+{
+	game_Cycles = 0;
     constexpr char ESC = 27;
     char key = 0;
     bool running = true;
@@ -56,23 +62,32 @@ void Game::run() {
     isGameOver = false;
     hideCursor();
     cls();
+    Player* lastPlayerToExit = nullptr; // Track the last player who exited the room
+	moveLevel(0);
+    screen.drawRoom();
+    //screen.debugShowAllSprings();
     Player* lastPlayerToExit = nullptr;
     drawCurrentRoom();
 
+
+    while (running && !isGameOver)
+    
     while ((running)&&(!isGameOver))
     {
+        
 
         if (p1.getRoom() != currentLevel && p2.getRoom() != currentLevel && lastPlayerToExit != nullptr)
         {
             moveLevel(lastPlayerToExit->getRoom());
-            current_riddle = Screen(riddles_chars[currentLevel]);
+            if (isGameOver) break;
+            current_riddle = Screen(riddles_chars[currentLevel], false, true);
             solved_Riddle = false;
             lastPlayerToExit = nullptr;
         }
         if (_kbhit())
         {
             key = _getch();
-            if (key == ESC) 
+            if (key == ESC)
             {
                 bool result = pauseMenu();
                 if (result) return; 
@@ -84,13 +99,10 @@ void Game::run() {
                     continue;
                 }
             }
-
-            
             if (p1.getRoom() == currentLevel) //if player1 is in the room, the keys are available
                 p1.keyPressed(key);
             if (p2.getRoom() == currentLevel) //if player2 is in the room, the keys are available
                 p2.keyPressed(key);
-            
         }
 
         bool envReady = solved_Riddle && switchesOn(screen);
@@ -100,10 +112,10 @@ void Game::run() {
         p1canpass = envReady&&hasKey;
         p2canpass = envReady && hasKey;
 
-
         Point prev_p1 = p1.getPoint();
         Point prev_p2 = p2.getPoint();
-     
+
+		
         if (p1.getRoom() == currentLevel)
         {
             if (p1.isInBoost())
@@ -165,6 +177,18 @@ void Game::run() {
                 if (movedP2)
                 {
                     lastPlayerToExit = &p2;
+                    gotoxy(prev_p2.getX(), prev_p2.getY()); std::cout << ' ';
+                    if (p2.getinventory() == 'K')
+                    {
+                        p2.setInventory('E');
+                    }
+                }
+            }
+        }
+        Bomb_explosion_logic(p1_activeBomb);
+        Bomb_explosion_logic(p2_activeBomb);
+
+
                     gotoxy(prev_p2.getX(), prev_p2.getY());
                     std::cout << ' ';
                     if (p2.getinventory() == 'K')
@@ -187,9 +211,10 @@ void Game::run() {
         {
             p2.draw_player();
         }
+
         screen.drawStatus(p1, p2);
 
-        
+		game_Cycles++;
         key = 0;
         Sleep(100);
     }
@@ -212,16 +237,129 @@ void Game::moveLevel(int new_level)
     press_switches = pressSwitches[currentLevel];
 
   
+void Game::moveLevel(int index)
+{
+    currentLevel = index;
+    try
+    {
+        screen = Screen(levels[index]);
+        Point legendPos = screen.getLegendPos();
+        int legendPos_Y = legendPos.getY(); 
+
+        if (legendPos_Y > 1 && legendPos_Y <= 20)
+        {
+            cls();
+            gotoxy(20, 8);
+            cerr << "Warning: Legend in center! Objects in this area were removed." << endl;
+			gotoxy(20, 10);
+            cerr << "This might make the level unplayable due to deleted items." << endl;
+			gotoxy(20, 13); 
+            cout << "Press 1 to continue with Legend in center." << endl;
+			gotoxy(20, 15);
+			cout << "Press 2 to move Legend automatically to bottom." << endl;
+            char choice = _getch();
+            if (choice == '2') 
+            {
+                screen = Screen(levels[index], false);
+
+                screen.setLegendPos(Point(0, 21)); //moving the legend to the bottom
+
+
+            }
+            else  if (choice == '1')//then we adjust players position
+            {
+                adjust_player_positions_acc_to_L(legendPos_Y);
+            }
+        }
+        else if(legendPos_Y > 21) //legend is already at the bottom
+        {
+            gotoxy(20, 12);
+            cerr << "Warning: Legend is too low! unable to play the game." << endl;
+            gotoxy(20, 15);
+            cout << "\npress 2 to Move Legend automatically to bottom. else - you must change the location of the legend to play." << endl;
+            char choice = _getch();
+            if (choice == '2')
+            {
+                screen = Screen(levels[index], false);
+
+                screen.setLegendPos(Point(0, 21)); //moving the legend to the bottom
+
+
+            }
+			else //then we end the game and go to main menu
+            {
+				this->isGameOver = true;
+				return;
+            }
+        }
+        else if (legendPos_Y == 1) //legend is at the top
+        {
+            gotoxy(20, 9);
+            cerr << "Warning: Legend is at the top. items might be deleted." << endl;
+            gotoxy(20, 12);
+            cout << "press 1 to keep the legend at the top." << endl;
+            gotoxy(20, 13);
+            cout << "press 2 to Move Legend automatically to bottom." << endl;
+            char choice = _getch();
+            if (choice == '2')
+            {
+                screen = Screen(levels[index], false);
+            }
+            else if (choice == '1')
+            {
+                adjust_player_positions_acc_to_L(legendPos_Y);
+			}
+		}
+        else if (legendPos_Y == 0)
+        {
+            gotoxy(20, 9);
+            cerr << "Warning: Legend is outside game borders." << endl;
+            gotoxy(20, 12);
+            cout << "press 1 to return to main menu and then change the L location." << endl;
+            gotoxy(20, 13);
+            cout << "press 2 to Move Legend automatically to bottom." << endl;
+            char choice = _getch();
+            if (choice == '2')
+            {
+                screen = Screen(levels[index], false);
+            }
+            else if (choice == '1')
+            {
+                this->isGameOver = true;
+                return;
+            }
+        }
+        else 
+        {
+            adjust_player_positions_acc_to_L(legendPos_Y);
+		}
+    }
+    catch (...)
+    {
+        cerr << "Problem loading level " << index << endl;
+    }
+    if(isGameOver)
+		return;
+       
     cls();
     p1.setPoint(2, 2, Direction::directions[Direction::STAY]);
     p2.setPoint(3, 3, Direction::directions[Direction::STAY]);
     drawCurrentRoom();
+    screen.drawRoom();
+    press_switches = 0;
+    solved_Riddle = false;
+
+    p1_activeSpring = nullptr;
+    p2_activeSpring = nullptr;
+    p1.setPower(1);
+    p2.setPower(1);
 }
 
-
-void Game::Menu() {
+void Game::Menu()
+{
     bool gameOver = false;
-    while (!gameOver) {
+    while (!gameOver)
+    {
         cls();
         gameMenu.drawRoom();
         char choice = _getch();
@@ -244,10 +382,12 @@ void Game::Menu() {
     }
 }
 
-bool Game::pauseMenu() {
+bool Game::pauseMenu()
+{
     pauseScreen.drawRoom();
     char choice = _getch();
-    switch (choice) {
+    switch (choice)
+    {
     case 'h':
     case 'H':
         return true;
@@ -258,7 +398,8 @@ bool Game::pauseMenu() {
     }
 }
 
-void Game::on_or_off_switch(Point& p, Screen& s) {
+void Game::on_or_off_switch(Point& p, Screen& s)
+{
     char currentContext = s.charAt(p);
     if (currentContext == '/') {
         pressSwitches[currentLevel]++;
@@ -304,38 +445,64 @@ bool Game::enterRoom(Player& p)
     return false;
 }
 
-bool Game::riddle_answers(Riddle r, Player& p) {
+bool Game::riddle_answers(Riddle r, Player& p)
+{
     char answer = _getch();
     answer = toupper(answer);
-    if (answer == r.getAnswer()) {
+    if (answer == r.getAnswer())
+    {
+        gotoxy(18, 18);
+        std::cout << "RIGHT ANSWER! GOOD JOB";
+		solved_Riddle = true;
+        Sleep(1500);
+
         return false;
     }
-    else {
+    else
+    {
         p.setLifePoints(p.getlifePoint() - 1);
-        return true;
+        if (p.getlifePoint() != 0) 
+        {
+            gotoxy(17, 18);
+            std::cout << "Wrong answer! Life points left: " << p.getlifePoint();
+            Sleep(1500);
+            return true;
+        }
+        else
+        {
+            gotoxy(17, 18);
+            std::cout << "WRONG ANSWER, GAME OVER!!!!!!!!";
+			Sleep(1500);
+			return true;
+        }
+    
     }
 }
 
-void Game::resetGame() {
+void Game::resetGame()
+{
     currentLevel = 0;
     //screen = Screen(levels[currentLevel]);
     //current_riddle = Screen(riddles_chars[currentLevel]);
     press_switches = 0;
     p1.setPoint(1, 1, Direction::directions[Direction::STAY]);
     p1.setInventory('E');
+    p1.setLifePoints(3);
     p1.setRoom(0);
     p1.setPower(1);
-    p1.setStepChar(' ');
+	p1.setStepChar(' ');
     p2.setPoint(2, 2, Direction::directions[Direction::STAY]);
-    p1.setLifePoints(3);
-    p2.setLifePoints(3);
     p2.setInventory('E');
+    p2.setLifePoints(3);
     p2.setRoom(0);
     p2.setPower(1);
     p2.setStepChar(' ');
+
+
 }
 
-bool Game::Push(Screen& screen, Player& p, int bonus_power) {
+bool Game::Push(Screen& screen, Player& p, int bonus_power)
+{
     Point next_point = p.getPoint().next();
     std::vector<Point> obstacle = screen.getObstacleVector(next_point);
 
@@ -461,7 +628,7 @@ void Game::handleMovement(Player& p, Player& other, bool clearPass) //handling t
         }
     }
 }
-void Game::boom(Circle c,Screen& screen)
+/*void Game::boom(Circle c, Screen& screen)
 {
     int startX = max(0, c.getCenter().getX() - c.getRadius());
     int endX = min(Screen::MAX_X - 4, c.getCenter().getX() + c.getRadius());
@@ -471,7 +638,7 @@ void Game::boom(Circle c,Screen& screen)
 
 
     Point pc = c.getCenter();
-    for(int i=startY;i<=endY;i++)
+    for (int i=startY;i<=endY;i++)
     {
         for (int j = startX; j <=endX; j++)
         {
@@ -481,17 +648,16 @@ void Game::boom(Circle c,Screen& screen)
             {
                 if(!screen.antiBoom(p))
                 {
-                    if (screen.isPlayer(p))
+                    if (c.inRange(p) && p == p1.getPoint())
                     {
-                        if(p==p1.getPoint())
-                        {
+                    
                             p1.setLifePoints(p1.getlifePoint() - 1);
-                        }
-                        else if(p == p2.getPoint())
-                        {
-                            p2.setLifePoints(p2.getlifePoint() - 1);
-                        }
                     }
+                    else if(c.inRange(p) && p == p2.getPoint())
+                    {
+                            p2.setLifePoints(p2.getlifePoint() - 1);
+                    }
+                    
                     else
                     {
                         screen.setChar(p, ' ');
@@ -503,16 +669,57 @@ void Game::boom(Circle c,Screen& screen)
             }
         }
     }
+}*/
+void Game::boom(Circle c, Screen& screen)
+{
+    int startX = max(0, c.getCenter().getX() - (int)c.getRadius());
+    int endX = min(Screen::MAX_X - 1, c.getCenter().getX() + (int)c.getRadius());
+    int startY = max(0, c.getCenter().getY() - (int)c.getRadius());
+    int endY = min(Screen::MAX_Y - 1, c.getCenter().getY() + (int)c.getRadius());
+
+    for (int i = startY; i <= endY; i++)
+    {
+        for (int j = startX; j <= endX; j++)
+        {
+            Point p(j, i);
+
+            if (c.inRange(p))
+            {
+                if (p == p1.getPoint())
+                {
+                    p1.setLifePoints(p1.getlifePoint() - 1);
+                }
+                if (p == p2.getPoint())
+                {
+                    p2.setLifePoints(p2.getlifePoint() - 1);
+                }
+
+                if (!screen.antiBoom(p))
+                {
+                    screen.setChar(p, ' ');
+
+                    gotoxy(p.getX(), p.getY());
+                    std::cout << ' ';
+                }
+            }
+        }
+    }
+    p1.draw_player();
+    p2.draw_player();
 }
-bool Game::fileToArray(const std::string& filename,
-    char dest[Screen::MAX_Y][Screen::MAX_X])
+bool Game::fileToArray(const std::string& filename, char dest[Screen::MAX_Y][Screen::MAX_X])
 {
     Screen temp(filename);
     const char (*p)[Screen::MAX_X] = temp.getScreen();
 
     for (int y = 0; y < Screen::MAX_Y; ++y)
+    {
         for (int x = 0; x < Screen::MAX_X; ++x)
+        {
             dest[y][x] = p[y][x];
+            
+        }
+    }
 
     return true;
 }
@@ -557,11 +764,16 @@ void Game::handleInteraction(Player& p, Point point, char drop_key_press) //hand
                         Point next = bombCenter;
                         next.move();
 
-
-                        if (screen.isWall(next))
+                        if (screen.isWall(next) || (screen.isObstacle(next)) || screen.isSpring(next))
                             break;
-                        if (screen.isObstacle(next))
-                            std::cout << "boom activate";
+                        gotoxy(bombCenter.getX(), bombCenter.getY());
+                        std::cout << '@';
+                        p1.draw_player();
+                        p2.draw_player();
+
+
+                        gotoxy(bombCenter.getX(), bombCenter.getY());
+                        std::cout << ' ';
 
                         bombCenter = next;
                     }
@@ -570,11 +782,22 @@ void Game::handleInteraction(Player& p, Point point, char drop_key_press) //hand
                     Circle c = { 4, bombCenter };
                     //p.drop_item(bombCenter, screen);
 
+                    if (&p == &p1)
+                    {
+						p1.setInventory('E');
+                        p1_activeBomb = new BOMB(bombCenter);
+                    }
+                    else
+                    {
+                        p2.setInventory('E');
+						p2_activeBomb = new BOMB(bombCenter);
+                    }
+                    /*Circle c = {4, bombCenter};
                     boom(c, screen);
+                    bombCenter.draw(' ');
                     p.setInventory('E');
-                }
-               
-                    
+                    */
+                   
                 
 
             }
@@ -634,6 +857,10 @@ bool Game::compressed(Player& p, Spring* spring)
 }
 bool Game::executeRiddle(Player& p)
 {
+	Point original_legendPos = screen.getLegendPos();
+    
+	current_riddle.setLegendPos(Point(0,22));
+	screen.setLegendPos(Point(0, 21));
     bool wrong = true;
     p1.freeze();
     p2.freeze();
@@ -650,6 +877,7 @@ bool Game::executeRiddle(Player& p)
         solved_Riddle = true;
         screen.setChar(p.getPoint(), ' ');
         p.setStepChar(' ');
+        screen.setLegendPos(original_legendPos);
         cls();
         screen.drawRoom();
         p1.draw_player();
@@ -657,6 +885,7 @@ bool Game::executeRiddle(Player& p)
         return true; //the riddle is solved
 
     }
+
     return false; // the player is dead and the game is over
 }
 void Game::handle_flying_movement(Player& p, Player& other, bool canPass, char key)//the situation after spring release 
@@ -820,4 +1049,48 @@ void Game::drawCurrentRoom()
 
 
 
+}
 
+void Game::adjust_player_positions_acc_to_L(int legendPos_Y)
+{
+    if (p1.getPoint().getY() >= legendPos_Y - 1 && p1.getPoint().getY() <= legendPos_Y + 3)
+    {
+        p1.setPoint(p1.getPoint().getX(), legendPos_Y + 4, Direction::directions[Direction::STAY]);
+        p1.setStepChar(' ');
+    }
+
+    if (p2.getPoint().getY() >= legendPos_Y - 1 && p2.getPoint().getY() <= legendPos_Y + 3)
+    {
+        p2.setPoint(p2.getPoint().getX(), legendPos_Y + 4, Direction::directions[Direction::STAY]);
+        p2.setStepChar(' ');
+    }
+}
+
+
+void Game::Bomb_explosion_logic(BOMB*& activeBomb) //handling the bomb logic for player p
+{
+    if (activeBomb == nullptr) return; 
+
+	if (activeBomb->update()) //the function that reduces the timer and returns true if the bomb is still active
+    {
+        int timeLeft = activeBomb->getTimer();
+        Point pos = activeBomb->getPos();
+
+        if (timeLeft > 0) 
+        {
+            gotoxy(pos.getX(), pos.getY());
+            std::cout << timeLeft;
+        }
+        else 
+        {
+
+            boom(activeBomb->getCircle(), screen); //BANGGGGGGGGGG
+
+            gotoxy(pos.getX(), pos.getY());
+            std::cout << ' ';
+
+			delete activeBomb; // Free the memory
+            activeBomb = nullptr;
+        }
+    }
+}

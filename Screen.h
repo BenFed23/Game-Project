@@ -6,8 +6,8 @@
 #include <iostream>
 #include "Spring.h"
 
-
-class Screen {
+class Screen
+{
 public:
 	static constexpr int MAX_X = 80;
 	static constexpr int MAX_Y = 25;
@@ -20,13 +20,14 @@ private:
 	int SwitchCounters = 0;
 	std::vector<Spring>springs;
 	bool darkmode=false;
+	Point legendPos; //position of the legend in the screen
 
 	bool isPointInVector(const std::vector<Point>& vec, int x, int y) const;
 
 
 public:
 	Screen();
-	Screen(const char input[MAX_Y][MAX_X]);
+	Screen(const char input[MAX_Y][MAX_X], bool createBottom = true, bool is_riddle = false);
 	Screen(const std::string& filename)
 	{
 		memset(level, ' ', sizeof(level));
@@ -39,15 +40,7 @@ public:
 	{
 		return level[p.getY()][p.getX()];
 	}
-	bool isPlayer(const Point& p)
-	{
-		if(((charAt(p))=='$')||((charAt(p)) == '&'))
-		{
-			return true;
-		}
-		return false;
-	}
-
+	bool isPlayer(const Point& p);
 
 	bool isBomb(const Point& p) const
 	{
@@ -71,7 +64,7 @@ public:
 
 	}
 	
-	 char (*getScreen() )[MAX_X]
+	char (*getScreen())[MAX_X] //TODO: check if this works
 	{
 		return level;
 	}
@@ -100,14 +93,8 @@ public:
 	{
 		return SwitchCounters;
 	}
-	bool antiBoom(const Point& p)
-	{
-		if ((charAt(p) == 'W') || (charAt(p) == 'K') || ((charAt(p) == '@')) || ((charAt(p) == '!')) || ((charAt(p) == '#')))
-		{
-			return true;
-		}
-		return false;
-	}
+	bool antiBoom(const Point& p);
+	
 	void clearItem(const Point& p);
 	void drawRoom() const;
 	void drawStatus(const Player& p1, const Player& p2) const;
@@ -116,6 +103,11 @@ public:
 	bool loadefile(const std::string& filename);
 	void buildSprings();
 	std::vector<Point> getSpringVector(Point startPoint);
+	
+
+
+
+
 	std::vector<Spring>& getSprings()
 	{
 		return springs;
@@ -127,5 +119,14 @@ public:
 	void changeDarkMode(bool new_mode)
 	{
 		darkmode = new_mode;
+	}
+	const Point& getLegendPos() const
+	{ 
+		return legendPos; 
+	}
+	
+	void setLegendPos(Point newlegend_pos) 
+	{
+		legendPos = newlegend_pos;
 	}
 };
