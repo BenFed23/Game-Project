@@ -1,4 +1,6 @@
 #include "GameFiles.h"
+
+
 GameFiles:: GameFiles()
 {
     steps.open("adv-world.steps");

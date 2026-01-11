@@ -1,6 +1,7 @@
 #pragma once
 #include "Game.h"
 #include <fstream>
+
 class GameFiles: public Game
 {
     std::string MoveFile="adv-world.steps";
@@ -8,6 +9,6 @@ class GameFiles: public Game
    
 public:
     GameFiles();
-    char handleinput()override;
+    char handleinput() override;
 };
 

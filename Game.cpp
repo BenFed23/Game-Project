@@ -1169,13 +1169,10 @@ bool Game::check_validity_of_L(Screen& screen)
 
             gotoxy(20, 12);
             cerr << "You must change Legend location." << endl;
-
-
-        if (timeLeft > 0) 
-        {
-            gotoxy(pos.getX(), pos.getY());
-            std::cout << timeLeft;
         }
+
+
+        
         else
         {
             adjust_player_positions_acc_to_L(legendPos_Y);//legend is in the right spot
