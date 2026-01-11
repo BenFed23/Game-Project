@@ -1,12 +1,23 @@
 ﻿#include "Player.h"
 #include "Game.h"
+#include "GameFiles.h"
+#include "GameRun.h"
 
-int main() 
+int main(int argc, char* argv[])
 {
-    Game g;
+    Game* g = nullptr;
 
-    
-    g.Menu();
+    if (argc >= 2 && std::string(argv[1]) == "-load")
+    {
+        g = new GameFiles();   
+        g->run();
+    }
+    else
+    {
+        g = new GameRun();    
+        g->Menu();
+    }
 
-   
+    delete g;
+    return 0;
 }

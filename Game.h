@@ -13,7 +13,6 @@ public:
 	static constexpr int TORCH_RADIUS = 8;
 	static constexpr int Bomb_RADIUS = 3;
 private:
-	int game_Cycles = 0;
 	bool isDark = false;
 	static const int NUMLEVELS = 3;
 	Screen screen;
@@ -47,8 +46,8 @@ private:
 	int explode_at_p2 = -1;
 	bool initFailed = false;
 	std::string initErrorMsg;
-
-
+protected:
+	int game_Cycles = 0;
 	
 	
 
@@ -70,6 +69,8 @@ public:
 		{2, 2, 70, 18} //level3
 	};
 	void run();
+	virtual char handleinput() = 0;
+	void record(std::string fileName);
 	void moveLevel(int index);
 	void Menu();
 	bool pauseMenu();

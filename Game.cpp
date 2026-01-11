@@ -125,9 +125,11 @@ void Game::run()
             solved_Riddle = false;
             lastPlayerToExit = nullptr;
         }
-        if (_kbhit())
-        {
-            key = _getch();
+        
+        
+            key = handleinput();
+            if (key == 0)
+                continue;
             if (key == ESC)
             {
                 bool result = pauseMenu();
@@ -144,7 +146,7 @@ void Game::run()
                 p1.keyPressed(key);
             if (p2.getRoom() == currentLevel) //if player2 is in the room, the keys are available
                 p2.keyPressed(key);
-        }
+        
 
         bool envReady = solved_Riddle && switchesOn(screen);
         bool hasKey = (p1.getinventory() == 'K') || (p2.getinventory() == 'K');
@@ -1220,4 +1222,8 @@ void Game::showFatalInitErrorAndExit()
     std::cout << "Press any key to exit...";
     _getch();
 }
+void Game:: record(std::string fileName)
+{
+    std::ofstream steps("adv-world.steps", std::ios::trunc);
 
+}

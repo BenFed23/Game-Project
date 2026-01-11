@@ -127,6 +127,8 @@
     <ClCompile Include="Circle.cpp" />
     <ClCompile Include="Direction.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameFiles.cpp" />
+    <ClCompile Include="GameRun.cpp" />
     <ClCompile Include="Items.cpp" />
     <ClCompile Include="items.h" />
     <ClCompile Include="main.cpp" />
@@ -142,6 +144,8 @@
     <ClInclude Include="Circle.h" />
     <ClInclude Include="Direction.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameFiles.h" />
+    <ClInclude Include="GameRun.h" />
     <ClInclude Include="Key.h" />
     <ClInclude Include="Obstacle.h" />
     <ClInclude Include="Player.h" />
@@ -153,6 +157,7 @@
     <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="adv-world.steps" />
     <None Include="adv-world_01.riddle" />
     <None Include="adv-world_02.riddle" />
     <None Include="adv-world_01.screen" />
