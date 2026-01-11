@@ -45,7 +45,6 @@
 
 		bool opposite(const Direction& dir);
 
-		void debugPrintIndices() const;
 
 
 		bool isFullyCompressed() const

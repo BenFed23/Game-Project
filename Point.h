@@ -7,7 +7,7 @@
 class Point {
 	int x = 0, y = 0;
 	Direction dir = Direction::directions[Direction::RIGHT];
-	char ch = '*';
+	char ch = ' ';
 public:
 	Point() {}
 	

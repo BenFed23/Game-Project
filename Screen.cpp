@@ -7,14 +7,14 @@
 #include <string>
 #include <string.h>
 #include <algorithm>
-
+#include "Circle.h"
 
 
 Screen::Screen()
 {
     memset(level, ' ', sizeof(level));
 }
-Screen::Screen(const char input[MAX_Y][MAX_X], bool createBottom , bool is_riddle)
+Screen::Screen(const char input[MAX_Y][MAX_X], bool createBottom)
 {
 
     for (int y = 0; y < MAX_Y; y++)
@@ -26,11 +26,7 @@ Screen::Screen(const char input[MAX_Y][MAX_X], bool createBottom , bool is_riddl
             {
                 SwitchCounters++;
             }
-            if (level[y][x] == 'L' && !is_riddle)
-            {
-                this->setLegendPos(Point(x, y));
-                level[y][x] = ' ';
-            }
+           
 
         }
 
@@ -146,10 +142,7 @@ void Screen::clearItem(const Point& p)
 
 void Screen::drawStatus(const Player& p1, const Player& p2) const 
 {
-    //int baseRow = Screen::MAX_Y - 4;
-
-
-
+  
 
 	Point legendPos = this->getLegendPos();
 	int legendPos_X = legendPos.getX();
@@ -164,6 +157,13 @@ void Screen::drawStatus(const Player& p1, const Player& p2) const
         std::cout << "Inventory: " << p1.getinventory();
         gotoxy(2, legendPos_Y + 2);
         std::cout << "Power: " << p1.getPower();
+        if (darkmode && p1.getinventory() != '!' && p2.getinventory() != '!')
+        {
+            gotoxy(15, 23);
+            std::cout << "Notice: you are in a dark room without a torch!";
+            gotoxy(15, 24);
+            std::cout << "You must to go back and get a torch to see!";
+        }
 
         gotoxy(65, legendPos_Y);
         std::cout << "P2 Life: " << p2.getlifePoint();
@@ -187,38 +187,8 @@ void Screen::drawStatus(const Player& p1, const Player& p2) const
         std::cout << "Inventory: " << p2.getinventory();
         gotoxy(50, legendPos_Y + 2);
         std::cout << "Power: " << p2.getPower();
-    }
-
-
-
-
-   /* gotoxy(2, baseRow);
-    std::cout << "Player1 Life: " << p1.getlifePoint();
-    gotoxy(2, baseRow + 1);
-    std::cout << "Inventory: " << p1.getinventory();
-    gotoxy(2, baseRow + 2);
-    std::cout << "Power: " << p1.getPower();
-
-
-    std::string p2Life = "Player2 Life: " + std::to_string(p2.getlifePoint());
-    std::string p2Inv = "Inventory: " + std::string(1, p2.getinventory());
-    std::string p2Pw = "Power: " + std::to_string(p2.getPower());
-
-    int colRightLife = Screen::MAX_X - p2Life.length();
-    int colRightInv = Screen::MAX_X - p2Inv.length();
-    int colRightPw = Screen::MAX_X - p2Pw.length();
-
-    gotoxy(colRightLife - 3, baseRow);
-    std::cout << p2Life;
-    gotoxy(colRightInv - 3, baseRow + 1);
-    std::cout << p2Inv;
-    gotoxy(colRightPw - 3, baseRow + 2);
-    std::cout << p2Pw;
-
-    std::cout << std::flush;*/
+    } 
 }
-
-
 bool Screen::isPointInVector(const std::vector<Point>& vec, int x, int y) const//checking if point is in vector
 {
     for (const Point& p : vec)
@@ -293,14 +263,10 @@ void Screen::setChar(const Point& p, char ch)
 
 bool Screen::isDoor(const Point& p) const
 {
-    int num = charAt(p) - '0';
-
-    if ((num > 4) || (num < 1))
-    {
-        return false;
-    }
-    return true;
+    char c = charAt(p);
+    return (c >= '0' && c <= '9');
 }
+
 std::vector<Point> Screen::getSpringVector(Point startPoint) //creating the spring vector
 {
     std::vector<Point> springPoints;
@@ -340,8 +306,32 @@ std::vector<Point> Screen::getSpringVector(Point startPoint) //creating the spri
     }
     return springPoints;
 }
-
 bool Screen::loadefile(const std::string& filename)
+{
+    std::ifstream file(filename);
+    if (!file) return false;
+
+    SwitchCounters = 0;
+    std::string line;
+
+    for (int y = 0; y < Screen::MAX_Y; y++)
+    {
+        if (!std::getline(file, line)) line.clear();
+
+        if (!line.empty() && line.back() == '\r')
+            line.pop_back();
+
+        for (int x = 0; x < Screen::MAX_X; x++)
+        {
+            char c = (x < (int)line.size()) ? line[x] : ' ';
+            level[y][x] = c;
+            
+        }
+    }
+    return true;
+   
+}
+bool Screen::loadefile(const std::string& filename, bool createBottom)
 {
     std::ifstream file(filename);
     if (!file) return false;
@@ -361,11 +351,95 @@ bool Screen::loadefile(const std::string& filename)
             char c = (x < (int)line.size()) ? line[x] : ' ';
             level[y][x] = c;
             if (c == '/') SwitchCounters++;
+            if (level[y][x] == 'L')
+            {
+                this->setLegendPos(Point(x, y));
+                level[y][x] = ' ';
+            }
+        }
+    }
+    int legendY = this->getLegendPos().getY();
+    if (createBottom)
+    {
+        if (legendY >= 1 && legendY < 21)
+        {
+            for (int i = legendY - 1; i <= legendY + 3; i++)
+            {
+                for (int j = 15; j <= 63; j++)
+                {
+                    if (i >= 0 && i < MAX_Y && j >= 0 && j < MAX_X)
+                    {
+                        if (i == legendY - 1 || i == legendY + 3 || j == 15 || j == 63)
+                        {
+                            level[i][j] = 'W';
+                        }
+                        else
+                        {
+                            level[i][j] = ' ';
+                        }
+                    }
+                }
+            }
+        }
+
+
+    }
+    if (!createBottom || legendY == 21)
+    {
+        this->setLegendPos(Point(0, 21));
+        legendY = 21;
+
+        for (int j = 0; j < MAX_X - 1; j++)
+        {
+            level[legendY - 1][j] = 'W';
+        }
+    }
+
+
+
+    for (int y = 0; y < MAX_Y; y++)
+    {
+        for (int x = 0; x < MAX_X; x++)
+        {
+            if (level[y][x] == '#')
+            {
+                bool alreadyInSpring = false;
+                for (const auto& s : springs)
+                {
+                    if (s.isPointOnSpring(Point(x, y)))
+                    {
+                        alreadyInSpring = true;
+                        break;
+                    }
+                }
+
+
+                if (!alreadyInSpring)
+                {
+                    std::vector<Point> springPoints = getSpringVector(Point(x, y));
+                    Direction dir = Direction::directions[Direction::LEFT];
+
+                    if (x == 1)
+                    {
+                        dir = Direction::directions[Direction::RIGHT];
+                    }
+                    else if (x == MAX_X - 2)
+                    {
+                        dir = Direction::directions[Direction::LEFT];
+                    }
+                    else if (y == MAX_Y - 2)
+                    {
+                        dir = Direction::directions[Direction::UP];
+                    }
+
+                    springs.emplace_back(springPoints, dir, '#');
+                }
+            }
+            
         }
     }
     return true;
 }
-
 void Screen::buildSprings()
 {
     springs.clear();
@@ -398,7 +472,6 @@ void Screen::buildSprings()
         }
     }
 }
-
 bool Screen::isPlayer(const Point& p)
 {
     if (((charAt(p)) == '$') || ((charAt(p)) == '&'))
@@ -407,7 +480,6 @@ bool Screen::isPlayer(const Point& p)
     }
     return false;
 }
-
 bool Screen::antiBoom(const Point& p)
 {
     if ((charAt(p) == 'W') || (charAt(p) == 'K' || ((charAt(p) == '@')) || ((charAt(p) == '!')) || ((charAt(p) == '#')) || charAt(p) == '?'))

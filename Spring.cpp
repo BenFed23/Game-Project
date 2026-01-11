@@ -123,13 +123,4 @@ bool Spring::opposite(const Direction& dir) //checking if the direction of the p
     return false;
 }
 
-void Spring::debugPrintIndices() const
-{
-    for (int i = 0; i < (int)locations.size(); i++) {
-        gotoxy(locations[i].getX(), locations[i].getY());
-        if (i < 10)
-            std::cout << i;
-        else
-            std::cout << (char)('A' + (i - 10));
-    }
-}
+

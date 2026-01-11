@@ -57,7 +57,10 @@
     <ClCompile Include="Spring.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BOMB.cpp">
+    <ClCompile Include="GameFiles.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameRun.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -98,7 +101,10 @@
     <ClInclude Include="Spring.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="BOMB.h">
+    <ClInclude Include="GameFiles.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameRun.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -111,5 +117,10 @@
     <None Include="adv-world_01.riddle" />
     <None Include="adv-world_02.riddle" />
     <None Include="adv-world_pause.screen" />
+    <None Include="adv-world_04.screen" />
+    <None Include="adv-world.steps" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="adv-world_03.riddle" />
   </ItemGroup>
 </Project>

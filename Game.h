@@ -6,11 +6,13 @@
 #include "Circle.h"
 #include<string>
 #include "Spring.h"
-#include "BOMB.h"
 
 class Game
 {
-	int game_Cycles = 0;
+public:
+	static constexpr int TORCH_RADIUS = 8;
+	static constexpr int Bomb_RADIUS = 3;
+private:
 	bool isDark = false;
 	static const int NUMLEVELS = 3;
 	Screen screen;
@@ -20,9 +22,9 @@ class Game
 	Screen pauseScreen;
 	Player p1;
 	Player p2;
-	char levels[NUMLEVELS][Screen::MAX_Y][Screen::MAX_X];
+	std::vector<Screen> savedlevels;
+	std::vector<Screen> originalLevels;
 	char riddles_chars[NUMLEVELS][Screen::MAX_Y][Screen::MAX_X];
-	int press_switches = 0;
 	int currentLevel;
 	Riddle riddles[NUMLEVELS - 1];
 	int visible_level = 1;
@@ -34,14 +36,25 @@ class Game
 	bool p1canpass = false;
 	bool p2canpass = false;
 	bool isGameOver = false;
-	BOMB* p1_activeBomb = nullptr;
-	BOMB* p2_activeBomb = nullptr;
-
-
+	std::vector<int> pressSwitches;
+	std::vector<bool> levelUnlocked;
+	bool p1_activated_bomb = false;
+	bool p2_activated_bomb = false;
+	Circle bomb_explosion_p1 = Circle(Bomb_RADIUS, Point(0,0));
+	Circle bomb_explosion_p2 = Circle(Bomb_RADIUS, Point(0, 1));
+	int explode_at_p1 = -1;
+	int explode_at_p2 = -1;
+	bool initFailed = false;
+	std::string initErrorMsg;
+protected:
+	int game_Cycles = 0;
+	
+	
 
 public:
 	
-	Game();
+	
+	Game() ;
 
 	struct StartPositions 
 	{
@@ -53,9 +66,11 @@ public:
 	{
 		{2, 13, 2, 2},   //level1
 		{5, 5, 20, 5},  //level2
-		{2, 18, 70, 18} //level3
+		{2, 2, 70, 18} //level3
 	};
 	void run();
+	virtual char handleinput() = 0;
+	void record(std::string fileName);
 	void moveLevel(int index);
 	void Menu();
 	bool pauseMenu();
@@ -81,5 +96,10 @@ public:
 	void handle_flying_movement(Player& p, Player& other, bool canPass, char key);
 	void handle_pre_spring_movement(Player& p, Player& other, bool canPass);
 	void adjust_player_positions_acc_to_L(int legendPos_Y);
-	void Bomb_explosion_logic(BOMB*& activeBomb);
+	void Bomb_explosion_logic(Circle& c, bool& activated_bomb, int& explode_at);
+	void drawDarkRoom(Screen& s, Circle& light);
+	void drawCurrentRoom();
+	bool check_validity_of_L(Screen& screen);
+	void showFatalInitErrorAndExit();
+
 };

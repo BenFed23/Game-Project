@@ -8,12 +8,16 @@ public:
 	Circle(){}
 	Circle(double r, Point c): center(c),radius(r) {}
 	bool inRange( Point& p);
-	const Point getCenter() const
+	Point getCenter() const
 	{
 		return this->center;
 	}
-	const int getRadius()
+	const double getRadius()
 	{
 		return this->radius;
+	}
+	void circle_setPoint(Point point)
+	{
+		center = point;
 	}
 };
