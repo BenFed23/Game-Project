@@ -31,12 +31,12 @@ public:
 	{
 		memset(level, ' ', sizeof(level));
 		SwitchCounters = 0;
-		loadefile(filename);
+		loadefile(filename); 
 		buildSprings();
 	}
 	Screen(const std::string& filename, bool Bottom)
 	{
-
+		
 		memset(level, ' ', sizeof(level));
 		SwitchCounters = 0;
 		loadefile(filename, Bottom);
@@ -111,8 +111,8 @@ public:
 	bool loadefile(const std::string& filename);
 	void buildSprings();
 	std::vector<Point> getSpringVector(Point startPoint);
-
-
+	
+	
 
 
 

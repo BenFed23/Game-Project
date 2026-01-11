@@ -12,7 +12,7 @@ public:
 	{
 		return this->center;
 	}
-	const int getRadius()
+	const double getRadius()
 	{
 		return this->radius;
 	}

@@ -23,6 +23,7 @@ void Point::move()
 }
 Point Point::next() const
 {
+
 	int nx = x + dir.dirx;
 	int ny = y + dir.diry;
 	return Point(nx, ny, dir, ch);

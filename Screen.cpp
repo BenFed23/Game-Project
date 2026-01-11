@@ -26,7 +26,7 @@ Screen::Screen(const char input[MAX_Y][MAX_X], bool createBottom)
             {
                 SwitchCounters++;
             }
-
+           
 
         }
 
@@ -142,11 +142,11 @@ void Screen::clearItem(const Point& p)
 
 void Screen::drawStatus(const Player& p1, const Player& p2) const
 {
+  
 
-
-    Point legendPos = this->getLegendPos();
-    int legendPos_X = legendPos.getX();
-    int legendPos_Y = legendPos.getY();
+	Point legendPos = this->getLegendPos();
+	int legendPos_X = legendPos.getX();
+	int legendPos_Y = legendPos.getY();
 
 
     if (legendPos_Y == 21)
@@ -187,7 +187,7 @@ void Screen::drawStatus(const Player& p1, const Player& p2) const
         std::cout << "Inventory: " << p2.getinventory();
         gotoxy(50, legendPos_Y + 2);
         std::cout << "Power: " << p2.getPower();
-    }
+    } 
 }
 bool Screen::isPointInVector(const std::vector<Point>& vec, int x, int y) const//checking if point is in vector
 {
@@ -325,11 +325,11 @@ bool Screen::loadefile(const std::string& filename)
         {
             char c = (x < (int)line.size()) ? line[x] : ' ';
             level[y][x] = c;
-
+            
         }
     }
     return true;
-
+   
 }
 bool Screen::loadefile(const std::string& filename, bool createBottom)
 {
@@ -343,7 +343,7 @@ bool Screen::loadefile(const std::string& filename, bool createBottom)
     {
         if (!std::getline(file, line)) line.clear();
 
-        if (!line.empty() && line.back() == '\r')
+        if (!line.empty() && line.back() == '\r')  
             line.pop_back();
 
         for (int x = 0; x < Screen::MAX_X; x++)
@@ -435,7 +435,7 @@ bool Screen::loadefile(const std::string& filename, bool createBottom)
                     springs.emplace_back(springPoints, dir, '#');
                 }
             }
-
+            
         }
     }
     return true;
