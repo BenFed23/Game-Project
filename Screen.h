@@ -19,7 +19,7 @@ private:
 	char level[MAX_Y][MAX_X];
 	int SwitchCounters = 0;
 	std::vector<Spring>springs;
-	bool darkmode=false;
+	bool darkmode = false;
 	Point legendPos; //position of the legend in the screen
 	bool isPointInVector(const std::vector<Point>& vec, int x, int y) const;
 
@@ -70,7 +70,7 @@ public:
 		return charAt(p) == '?';
 
 	}
-	
+
 	char (*getScreen())[MAX_X] //TODO: check if this works
 	{
 		return level;
@@ -101,13 +101,13 @@ public:
 		return SwitchCounters;
 	}
 	bool antiBoom(const Point& p);
-	
+
 	void clearItem(const Point& p);
 	void drawRoom() const;
 	void drawStatus(const Player& p1, const Player& p2) const;
 	std::vector<Point> getObstacleVector(Point startPoint);
 	bool isPointPartOfObstacle(const std::vector<Point>& obstacle, const Point& p) const;
-	bool loadefile(const std::string& filename,bool createBottom);
+	bool loadefile(const std::string& filename, bool createBottom);
 	bool loadefile(const std::string& filename);
 	void buildSprings();
 	std::vector<Point> getSpringVector(Point startPoint);
@@ -129,11 +129,11 @@ public:
 		darkmode = new_mode;
 	}
 	const Point& getLegendPos() const
-	{ 
-		return legendPos; 
+	{
+		return legendPos;
 	}
-	
-	void setLegendPos(Point newlegend_pos) 
+
+	void setLegendPos(Point newlegend_pos)
 	{
 		legendPos = newlegend_pos;
 	}

@@ -127,7 +127,7 @@ public:
 		return boostFramesLeft > 0;
 	}
 
-	
+
 	bool operator==(const Player& other) const
 	{
 		return (this->symbol == other.symbol);

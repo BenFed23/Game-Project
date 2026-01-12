@@ -6,6 +6,7 @@
 #include <iostream>
 #include "Riddle.h"
 #include "Circle.h"
+#include <fstream>
 
 using namespace std;
 
@@ -128,8 +129,7 @@ void Game::run()
         
         
             key = handleinput();
-            if (key == 0)
-                continue;
+            
             if (key == ESC)
             {
                 bool result = pauseMenu();
@@ -141,6 +141,10 @@ void Game::run()
                     key = 0;
                     continue;
                 }
+            }
+            if (key != 0 && key != ESC)
+            {
+                add_line(game_Cycles, key);
             }
             if (p1.getRoom() == currentLevel) //if player1 is in the room, the keys are available
                 p1.keyPressed(key);
@@ -252,8 +256,9 @@ void Game::run()
         game_Cycles++;
         key = 0;
         Sleep(100);
-
+       
     }
+	record("adv-world.steps");
 }
 void Game::moveLevel(int index)
 {
@@ -380,7 +385,7 @@ bool Game::riddle_answers(Riddle r, Player& p)
     {
         gotoxy(18, 18);
         std::cout << "RIGHT ANSWER! GOOD JOB";
-		solved_Riddle = true;
+        solved_Riddle = true;
         Sleep(1500);
 
         return false;
@@ -388,7 +393,7 @@ bool Game::riddle_answers(Riddle r, Player& p)
     else
     {
         p.setLifePoints(p.getlifePoint() - 1);
-        if (p.getlifePoint() != 0) 
+        if (p.getlifePoint() != 0)
         {
             gotoxy(17, 18);
             std::cout << "Wrong answer! Life points left: " << p.getlifePoint();
@@ -399,10 +404,10 @@ bool Game::riddle_answers(Riddle r, Player& p)
         {
             gotoxy(17, 18);
             std::cout << "WRONG ANSWER, GAME OVER!!!!!!!!";
-			Sleep(1500);
-			return true;
+            Sleep(1500);
+            return true;
         }
-    
+
     }
 }
 
@@ -772,10 +777,10 @@ bool Game::compressed(Player& p, Spring* spring)
 }
 bool Game::executeRiddle(Player& p)
 {
-	Point original_legendPos = screen.getLegendPos();
-    
-	current_riddle.setLegendPos(Point(0,22));
-	screen.setLegendPos(Point(0, 21));
+    Point original_legendPos = screen.getLegendPos();
+
+    current_riddle.setLegendPos(Point(0, 22));
+    screen.setLegendPos(Point(0, 21));
     bool wrong = true;
     p1.freeze();
     p2.freeze();
@@ -1169,29 +1174,10 @@ bool Game::check_validity_of_L(Screen& screen)
 
             gotoxy(20, 12);
             cerr << "You must change Legend location." << endl;
-
-
-           /* gotoxy(20, 12);
-            cout << "press 1 to return to main menu and then change the L location." << endl;
-            gotoxy(20, 13);
-            cout << "press 2 to Move Legend automatically to bottom." << endl;
-            char choice = _getch();
-            if (choice == '2')
-            {
-                //screen = Screen(worldFiles[index], false);
-                screen.setLegendPos(Point(0, 21)); //moving the legend to the bottom
-            }
-            else if (choice == '1')
-            {
-                this->isGameOver = true;
-               
-            }
-            return false;
-            */
-            Sleep(5000);
-
-            return false;
         }
+
+
+        
         else
         {
             adjust_player_positions_acc_to_L(legendPos_Y);//legend is in the right spot
@@ -1221,9 +1207,4 @@ void Game::showFatalInitErrorAndExit()
     gotoxy(2, 6);
     std::cout << "Press any key to exit...";
     _getch();
-}
-void Game:: record(std::string fileName)
-{
-    std::ofstream steps("adv-world.steps", std::ios::trunc);
-
 }

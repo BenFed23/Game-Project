@@ -61,15 +61,15 @@ Screen::Screen(const char input[MAX_Y][MAX_X], bool createBottom)
     if (!createBottom || legendY == 21)
     {
         this->setLegendPos(Point(0, 21));
-		legendY = 21;
-        
+        legendY = 21;
+
         for (int j = 0; j < MAX_X - 1; j++)
         {
             level[legendY - 1][j] = 'W';
         }
     }
 
-    
+
 
     for (int y = 0; y < MAX_Y; y++)
     {
@@ -140,7 +140,7 @@ void Screen::clearItem(const Point& p)
     std::cout << ' ';
 }
 
-void Screen::drawStatus(const Player& p1, const Player& p2) const 
+void Screen::drawStatus(const Player& p1, const Player& p2) const
 {
   
 
@@ -148,7 +148,7 @@ void Screen::drawStatus(const Player& p1, const Player& p2) const
 	int legendPos_X = legendPos.getX();
 	int legendPos_Y = legendPos.getY();
 
-	
+
     if (legendPos_Y == 21)
     {
         gotoxy(2, legendPos_Y);
@@ -171,7 +171,7 @@ void Screen::drawStatus(const Player& p1, const Player& p2) const
         std::cout << "Inventory: " << p2.getinventory();
         gotoxy(65, legendPos_Y + 2);
         std::cout << "Power: " << p2.getPower();
-	}
+    }
     else
     {
         gotoxy(17, legendPos_Y);
