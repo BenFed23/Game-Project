@@ -6,6 +6,7 @@
 #include <iostream>
 #include "Riddle.h"
 #include "Circle.h"
+#include <fstream>
 
 using namespace std;
 
@@ -128,8 +129,7 @@ void Game::run()
         
         
             key = handleinput();
-            if (key == 0)
-                continue;
+            
             if (key == ESC)
             {
                 bool result = pauseMenu();
@@ -141,6 +141,10 @@ void Game::run()
                     key = 0;
                     continue;
                 }
+            }
+            if (key != 0 && key != ESC)
+            {
+                add_line(game_Cycles, key);
             }
             if (p1.getRoom() == currentLevel) //if player1 is in the room, the keys are available
                 p1.keyPressed(key);
@@ -252,8 +256,9 @@ void Game::run()
         game_Cycles++;
         key = 0;
         Sleep(100);
-
+       
     }
+	record("adv-world.steps");
 }
 void Game::moveLevel(int index)
 {
@@ -1202,9 +1207,4 @@ void Game::showFatalInitErrorAndExit()
     gotoxy(2, 6);
     std::cout << "Press any key to exit...";
     _getch();
-}
-void Game:: record(std::string fileName)
-{
-    std::ofstream steps("adv-world.steps", std::ios::trunc);
-
 }

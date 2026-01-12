@@ -1,32 +1,36 @@
-#include "GameRun.h"
+#include "GameRun.h" 
 #include <conio.h>
+#include "utils.h"
 
-GameRun::GameRun()
-{
-    stepsFile.open("adv-world.steps", std::ios::trunc);
-}
 
-GameRun::~GameRun()
-{
-    if (stepsFile.is_open())
-        stepsFile.close();
-}
 char GameRun:: handleinput()
 {
     char key = 0;
     if (_kbhit())
     {
         key = _getch();
-        if (key != 0 && stepsFile.is_open())
-        {
-			stepsFile << game_Cycles << ":" << key << std::endl; //write the step to the file
-
-			stepsFile.flush();// ensure data is written immediately
-        }
-        
-
     }
+    
     return key;
 }
+
+void Game::record(std::string fileName)
+{
+
+    std::ofstream steps_file(fileName, std::ios::trunc);
+    if (!steps_file.is_open())
+    {
+        gotoxy(20, 23);
+        std::cout << "Error opening file for writing: " << fileName << std::endl;
+        return;
+    }
+    for (const auto& step : steps)
+    {
+        steps_file << '\n' << step.first << ' ' << step.second;
+    }
+    steps_file.close();
+
+}
+
 
 

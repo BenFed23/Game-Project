@@ -6,6 +6,7 @@
 #include "Circle.h"
 #include<string>
 #include "Spring.h"
+#include <list>
 
 class Game
 {
@@ -48,6 +49,8 @@ private:
 	std::string initErrorMsg;
 protected:
 	int game_Cycles = 0;
+	std::list<std::pair<size_t, char>> steps; // pair: iteration, step
+
 	
 	
 
@@ -70,7 +73,6 @@ public:
 	};
 	void run();
 	virtual char handleinput() = 0;
-	void record(std::string fileName);
 	void moveLevel(int index);
 	void Menu();
 	bool pauseMenu();
@@ -101,5 +103,11 @@ public:
 	void drawCurrentRoom();
 	bool check_validity_of_L(Screen& screen);
 	void showFatalInitErrorAndExit();
+	virtual void record(std::string fileName) = 0;
+
+	void add_line(int game_cycle, char key)
+	{
+		steps.push_back({ game_cycle, key });
+	}
 
 };
