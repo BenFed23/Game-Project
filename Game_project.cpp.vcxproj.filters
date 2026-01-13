@@ -119,6 +119,7 @@
     <None Include="adv-world_pause.screen" />
     <None Include="adv-world_04.screen" />
     <None Include="adv-world.steps" />
+    <None Include="adv-world.result" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="adv-world_03.riddle" />

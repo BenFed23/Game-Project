@@ -41,23 +41,27 @@ private:
 	std::vector<bool> levelUnlocked;
 	bool p1_activated_bomb = false;
 	bool p2_activated_bomb = false;
-	Circle bomb_explosion_p1 = Circle(Bomb_RADIUS, Point(0,0));
+	Circle bomb_explosion_p1 = Circle(Bomb_RADIUS, Point(0, 0));
 	Circle bomb_explosion_p2 = Circle(Bomb_RADIUS, Point(0, 1));
 	int explode_at_p1 = -1;
 	int explode_at_p2 = -1;
 	bool initFailed = false;
 	std::string initErrorMsg;
+	const char validKeys[24] =
+	{
+		'w', 'd', 'x', 'a', 's', 'e', 'i', 'l', 'm', 'j', 'k', 'o',
+		'W', 'D', 'X', 'A', 'S', 'E', 'I', 'L', 'M', 'J', 'K', 'O'
+	};
 protected:
 	int game_Cycles = 0;
 	std::list<std::pair<size_t, char>> steps; // pair: iteration, step
 
-	
-	
+
 
 public:
-	
-	
-	Game() ;
+
+
+	Game();
 
 	struct StartPositions
 	{
@@ -103,11 +107,8 @@ public:
 	void drawCurrentRoom();
 	bool check_validity_of_L(Screen& screen);
 	void showFatalInitErrorAndExit();
-	virtual void record(std::string fileName) = 0;
-
-	void add_line(int game_cycle, char key)
-	{
-		steps.push_back({ game_cycle, key });
-	}
+	void record(std::string fileName);
+	void add_line_to_steps(int game_cycle, char key);
+	void write_to_result_file(const std::string& message);
 
 };

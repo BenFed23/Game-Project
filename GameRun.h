@@ -10,7 +10,6 @@ class GameRun:public Game
 public:
 	
 	char handleinput() override;
-	void record(std::string fileName);
 
 	
 };

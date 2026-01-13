@@ -164,7 +164,8 @@ void Screen::drawStatus(const Player& p1, const Player& p2) const
             gotoxy(15, 24);
             std::cout << "You must to go back and get a torch to see!";
         }
-
+		gotoxy(30, legendPos_Y);
+		std::cout << "score: " << p1.getlifePoint() * 100 + p1.getPower() * 50;
         gotoxy(65, legendPos_Y);
         std::cout << "P2 Life: " << p2.getlifePoint();
         gotoxy(65, legendPos_Y + 1);
@@ -488,5 +489,3 @@ bool Screen::antiBoom(const Point& p)
     }
     return false;
 }
-
-
