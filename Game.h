@@ -41,7 +41,7 @@ private:
 	std::vector<bool> levelUnlocked;
 	bool p1_activated_bomb = false;
 	bool p2_activated_bomb = false;
-	Circle bomb_explosion_p1 = Circle(Bomb_RADIUS, Point(0,0));
+	Circle bomb_explosion_p1 = Circle(Bomb_RADIUS, Point(0, 0));
 	Circle bomb_explosion_p2 = Circle(Bomb_RADIUS, Point(0, 1));
 	int explode_at_p1 = -1;
 	int explode_at_p2 = -1;
@@ -51,13 +51,13 @@ protected:
 	int game_Cycles = 0;
 	std::list<std::pair<size_t, char>> steps; // pair: iteration, step
 
-	
-	
+
+
 
 public:
-	
-	
-	Game() ;
+
+
+	Game();
 
 	struct StartPositions
 	{

@@ -14,7 +14,7 @@ char GameRun:: handleinput()
     return key;
 }
 
-void Game::record(std::string fileName)
+void GameRun::record(std::string fileName)
 {
 
     std::ofstream steps_file(fileName, std::ios::trunc);
