@@ -157,6 +157,7 @@
     <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="adv-world.result" />
     <None Include="adv-world.steps" />
     <None Include="adv-world_01.riddle" />
     <None Include="adv-world_02.riddle" />

@@ -133,7 +133,11 @@ void Game::run()
             if (key == ESC)
             {
                 bool result = pauseMenu();
-                if (result) return;
+                if (result)
+                {
+					record("adv-world.steps");
+                    return;
+                }
                 else
                 {
                     cls();
@@ -144,7 +148,7 @@ void Game::run()
             }
             if (key != 0 && key != ESC)
             {
-                add_line(game_Cycles, key);
+                add_line_to_steps(game_Cycles, key);
             }
             if (p1.getRoom() == currentLevel) //if player1 is in the room, the keys are available
                 p1.keyPressed(key);
@@ -256,6 +260,7 @@ void Game::run()
         game_Cycles++;
         key = 0;
         Sleep(100);
+
        
     }
 	record("adv-world.steps");
@@ -392,6 +397,7 @@ bool Game::riddle_answers(Riddle r, Player& p)
     }
     else
     {
+
         p.setLifePoints(p.getlifePoint() - 1);
         if (p.getlifePoint() != 0)
         {
@@ -1208,3 +1214,36 @@ void Game::showFatalInitErrorAndExit()
     std::cout << "Press any key to exit...";
     _getch();
 }
+
+void Game::record(std::string fileName)
+{
+
+    std::ofstream steps_file(fileName, std::ios::trunc);
+    if (!steps_file.is_open())
+    {
+        gotoxy(20, 23);
+        std::cout << "Error opening file for writing: " << fileName << std::endl;
+        return;
+    }
+    for (const auto& step : steps)
+    {
+        steps_file << '\n' << step.first << ' ' << step.second;
+    }
+    steps_file.close();
+
+
+}
+
+void Game::add_line_to_steps(int game_cycle, char key)
+{
+    for (int i = 0; i < 24; i++)
+    {
+        if (key == validKeys[i])
+        {
+            steps.push_back({ game_cycle, key });
+        }
+
+
+    }
+}
+
