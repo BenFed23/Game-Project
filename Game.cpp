@@ -82,6 +82,8 @@ Game::Game() : currentLevel(0), p1('$', 1, 1, "wdxas", 'e'), p2('&', 2, 2, "ilmj
 
 void Game::run()
 {
+    std::ofstream("adv-world.result", std::ios::trunc).close();
+
     game_Cycles = 0;
     constexpr char ESC = 27;
     char key = 0;
@@ -263,6 +265,8 @@ void Game::run()
 
        
     }
+    write_to_result_file(std::string("game over.\n"));
+
 	record("adv-world.steps");
 }
 void Game::moveLevel(int index)
@@ -364,7 +368,16 @@ bool Game::enterRoom(Player& p)
 
 
         int nextRoomIndex = target - '0';
+        if (p.getPoint().getChar() == '$')
+        {
+            write_to_result_file(std::string("player 1 moved from level ") + std::to_string(p.getRoom()) + " to level " + std::to_string(nextRoomIndex));
+        }
+        else if (p.getPoint().getChar() == '&')
+        {
+            write_to_result_file(std::string("player 2 moved from level ") + std::to_string(p.getRoom()) + " to level " + std::to_string(nextRoomIndex));
+        }
         p.setRoom(nextRoomIndex);
+
 
         if (&p == &p1)
         {
@@ -388,6 +401,8 @@ bool Game::riddle_answers(Riddle r, Player& p)
     answer = toupper(answer);
     if (answer == r.getAnswer())
     {
+        
+		write_to_result_file(std::string("player chose answer ") + answer + " and solved the riddle.\n" );
         gotoxy(18, 18);
         std::cout << "RIGHT ANSWER! GOOD JOB";
         solved_Riddle = true;
@@ -401,6 +416,8 @@ bool Game::riddle_answers(Riddle r, Player& p)
         p.setLifePoints(p.getlifePoint() - 1);
         if (p.getlifePoint() != 0)
         {
+            write_to_result_file(std::string("player chose answer ") + answer + " and was wrong. therefore he lost a life.\n");
+
             gotoxy(17, 18);
             std::cout << "Wrong answer! Life points left: " << p.getlifePoint();
             Sleep(1500);
@@ -408,6 +425,8 @@ bool Game::riddle_answers(Riddle r, Player& p)
         }
         else
         {
+            write_to_result_file(std::string("player chose answer ") + answer + " and was wrong. now he's dead, and the game is over.\n");
+
             gotoxy(17, 18);
             std::cout << "WRONG ANSWER, GAME OVER!!!!!!!!";
             Sleep(1500);
@@ -467,6 +486,8 @@ void Game::resetGame()
     explode_at_p2 = -1;
     bomb_explosion_p1.circle_setPoint(Point(-1, -1));
     bomb_explosion_p2.circle_setPoint(Point(-1, -1));
+    std::ofstream res_file("adv-world.result", std::ios::trunc);
+
 }
 bool Game::Push(Screen& screen, Player& p, int bonus_power)
 {
@@ -610,11 +631,15 @@ void Game::boom(Circle c, Screen& screen)
             if (c.inRange(p))
             {
                 if (p == p1.getPoint())
-                {
-                    p1.setLifePoints(p1.getlifePoint() - 1);
+                { 
+                    write_to_result_file(std::string("player 1 was hit by a bomb and lost life point.\n"));
+
+                   p1.setLifePoints(p1.getlifePoint() - 1);
                 }
                 if (p == p2.getPoint())
                 {
+                    write_to_result_file(std::string("player 2 was hit by a bomb and lost life point.\n"));
+
                     p2.setLifePoints(p2.getlifePoint() - 1);
                 }
 
@@ -1247,3 +1272,15 @@ void Game::add_line_to_steps(int game_cycle, char key)
     }
 }
 
+void Game::write_to_result_file(const std::string& message) 
+{
+    std::ofstream res_file("adv-world.result", std::ios::app);
+
+    if (res_file.is_open()) 
+    {
+        res_file << game_Cycles << " " << message << "\n";
+
+
+        res_file.close();
+    }
+}

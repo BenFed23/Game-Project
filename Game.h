@@ -109,4 +109,6 @@ public:
 	void showFatalInitErrorAndExit();
 	void record(std::string fileName);
 	void add_line_to_steps(int game_cycle, char key);
+	void write_to_result_file(const std::string& message);
+
 };
