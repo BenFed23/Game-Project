@@ -2,6 +2,8 @@
 #include "Game.h"
 #include "GameFiles.h"
 #include "GameRun.h"
+#include "utils.h"
+
 
 int main(int argc, char* argv[])
 {
@@ -11,6 +13,7 @@ int main(int argc, char* argv[])
     {
         g = new GameFiles();   
         g->run();
+        cls();
     }
     else
     {

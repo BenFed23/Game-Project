@@ -247,7 +247,7 @@ void Game::run()
             drawCurrentRoom();
 
 
-        if (p1.getRoom() == currentLevel && !screen.isDoor(p1.getPoint()))
+       if (p1.getRoom() == currentLevel && !screen.isDoor(p1.getPoint()))
         {
             p1.draw_player();
         }
@@ -256,7 +256,7 @@ void Game::run()
         {
             p2.draw_player();
         }
-
+        
         screen.drawStatus(p1, p2);
 
         game_Cycles++;
@@ -397,7 +397,17 @@ bool Game::enterRoom(Player& p)
 
 bool Game::riddle_answers(Riddle r, Player& p)
 {
-    char answer = _getch();
+    char answer = handleinput();
+
+    if (answer == 0)
+    {
+        game_Cycles++;
+        Sleep(100);
+        return true;
+    }
+
+    add_line_to_steps_from_riddle(game_Cycles, answer);
+
     answer = toupper(answer);
     if (answer == r.getAnswer())
     {
@@ -816,6 +826,7 @@ bool Game::executeRiddle(Player& p)
     p1.freeze();
     p2.freeze();
 
+
     while (p.getlifePoint() > 0 && wrong)
     {
         current_riddle.drawRoom();
@@ -983,7 +994,6 @@ void Game::drawCurrentRoom()
 
     bool dark = screen.isDarkRoom();
 
-    // אם עברנו חדר או מצב חושך השתנה -> חייב ציור מלא
     if (currentLevel != lastLevel || dark != lastDark)
     {
         initialized = false;
@@ -1282,5 +1292,16 @@ void Game::write_to_result_file(const std::string& message)
 
 
         res_file.close();
+    }
+}
+
+void Game::add_line_to_steps_from_riddle(int game_cycle, char key)
+{
+    char upperKey = toupper(key);
+
+    if (upperKey == 'A' || upperKey == 'B' ||
+        upperKey == 'C' || upperKey == 'D')
+    {
+        steps.push_back({ (size_t)game_cycle, key });
     }
 }

@@ -6,9 +6,24 @@ GameFiles:: GameFiles()
     steps.open("adv-world.steps");
     if (!steps)
         throw std::string("Failed to open adv-world.steps");
+
+	readNextStep();
    
 }
-char GameFiles::handleinput()
+
+
+void GameFiles::readNextStep() // Reads the next step from the steps file
+{
+    if (!(steps >> nextStepCycle >> nextStepKey))
+    {
+        nextStepCycle = -1;
+        nextStepKey = 0;
+    }
+}
+
+
+
+/*char GameFiles::handleinput()
 {
     std::string line;
     if (!std::getline(steps, line))
@@ -24,4 +39,18 @@ char GameFiles::handleinput()
     if (k == '.') return 0;   
     return k;
 }
+*/
 
+char GameFiles::handleinput()
+{
+    if (nextStepCycle != -1 && game_Cycles == nextStepCycle)
+    {
+        char keyToReturn = nextStepKey;
+
+        readNextStep();
+
+        return keyToReturn;
+    }
+
+    return 0;
+}
