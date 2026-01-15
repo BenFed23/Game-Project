@@ -52,6 +52,16 @@ private:
 		'w', 'd', 'x', 'a', 's', 'e', 'i', 'l', 'm', 'j', 'k', 'o',
 		'W', 'D', 'X', 'A', 'S', 'E', 'I', 'L', 'M', 'J', 'K', 'O'
 	};
+
+	enum class RiddleAnswer_Options : char 
+	{
+		A = 'A',
+		B = 'B',
+		C = 'C',
+		D = 'D'
+	}; 
+
+
 protected:
 	int game_Cycles = 0;
 	std::list<std::pair<size_t, char>> steps; // pair: iteration, step
@@ -109,6 +119,8 @@ public:
 	void showFatalInitErrorAndExit();
 	void record(std::string fileName);
 	void add_line_to_steps(int game_cycle, char key);
+	void add_line_to_steps_from_riddle(int game_cycle, char key);
+
 	void write_to_result_file(const std::string& message);
 
 };
