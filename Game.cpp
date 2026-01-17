@@ -19,7 +19,8 @@ Game::Game() : currentLevel(0), p1('$', 1, 1, "wdxas", 'e'), p2('&', 2, 2, "ilmj
         fileToLevel("adv-world_pause.screen", pauseScreen);
         fileToLevel("adv-world_indructions.screen", instructions);
 
-        std::vector<std::string> levelFiles = {
+        std::vector<std::string> levelFiles = 
+        {
             "adv-world_01.screen",
             "adv-world_02.screen",
             "adv-world_03.screen",
@@ -37,6 +38,11 @@ Game::Game() : currentLevel(0), p1('$', 1, 1, "wdxas", 'e'), p2('&', 2, 2, "ilmj
         savedlevels.clear();
         pressSwitches.clear();
         levelUnlocked.clear();
+
+        for (int i = 0; i < NUMLEVELS; ++i)
+        {
+            lastPositions[i] = levelStarts[i];
+        }
 
         for (size_t i = 0; i < levelFiles.size(); ++i)
         {
@@ -78,6 +84,7 @@ Game::Game() : currentLevel(0), p1('$', 1, 1, "wdxas", 'e'), p2('&', 2, 2, "ilmj
         initFailed = true;
         initErrorMsg = "Unknown error while loading game files.";
     }
+    
 }
 
 void Game::run()
@@ -97,7 +104,9 @@ void Game::run()
     hideCursor();
     cls();
     Player* lastPlayerToExit = nullptr; // Track the last player who exited the room
+    
     drawCurrentRoom();
+    
 
 
     while (running && !isGameOver)
@@ -106,17 +115,21 @@ void Game::run()
         {
             if (p1.getlifePoint() == 0)
             {
+            
                 gotoxy(20, 23);
                 std::cout << "Player 1 is dead! GAME OVER!";
                 Sleep(5000);
                 isGameOver = true;
+            
+                
             }
             else if (p2.getlifePoint() == 0)
             {
-                gotoxy(20, 23);
-                std::cout << "Player 2 is dead! GAME OVER!";
-                Sleep(5000);
-                isGameOver = true;
+               gotoxy(20, 23);
+               std::cout << "Player 2 is dead! GAME OVER!";
+               Sleep(5000);
+               isGameOver = true;
+                
             }
 
         }
@@ -130,40 +143,42 @@ void Game::run()
         }
         
         
-            key = handleinput();
-            
-            if (key == ESC)
+        key = handleinput();
+          
+        if (key == ESC)
+        {
+            bool result = pauseMenu();
+            if (result)
             {
-                bool result = pauseMenu();
-                if (result)
-                {
-					record("adv-world.steps");
-                    return;
-                }
-                else
-                {
-                    cls();
-                    drawCurrentRoom();
-                    key = 0;
-                    continue;
-                }
+		     record("adv-world.steps");
+                return;
             }
-            if (key != 0 && key != ESC)
+            else
             {
-                add_line_to_steps(game_Cycles, key);
+                cls();
+                
+                drawCurrentRoom();
+                
+                key = 0;
+                continue;
             }
-            if (p1.getRoom() == currentLevel) //if player1 is in the room, the keys are available
-                p1.keyPressed(key);
-            if (p2.getRoom() == currentLevel) //if player2 is in the room, the keys are available
-                p2.keyPressed(key);
+        }
+        if (key != 0 && key != ESC)
+        {
+            add_line_to_steps(game_Cycles, key);
+        }
+        if (p1.getRoom() == currentLevel) //if player1 is in the room, the keys are available
+            p1.keyPressed(key);
+        if (p2.getRoom() == currentLevel) //if player2 is in the room, the keys are available
+            p2.keyPressed(key);
         
 
         bool envReady = solved_Riddle && switchesOn(screen);
-        bool hasKey = (p1.getinventory() == 'K') || (p2.getinventory() == 'K');
-
-
-        p1canpass = envReady && hasKey;
-        p2canpass = envReady && hasKey;
+        bool hasKey1 = (p1.getinventory() == 'K');
+        bool hasKey2 = (p2.getinventory() == 'K');
+        
+        p1canpass = envReady && hasKey1;
+        p2canpass = envReady && hasKey2;
 
         Point prev_p1 = p1.getPoint();
         Point prev_p2 = p2.getPoint();
@@ -181,14 +196,8 @@ void Game::run()
                 if (isGameOver)
                     break;
                 handle_pre_spring_movement(p1, p2, p1canpass);
-
-
-
-
+           
                 bool movedP1 = enterRoom(p1);
-
-
-
                 if (movedP1)
                 {
                     lastPlayerToExit = &p1;
@@ -203,6 +212,7 @@ void Game::run()
 
             }
         }
+
         if (p2.getRoom() == currentLevel)
         {
             if (p2.isInBoost())
@@ -244,25 +254,38 @@ void Game::run()
             Bomb_explosion_logic(bomb_explosion_p2, p2_activated_bomb, explode_at_p2);
         }
         if (screen.isDarkRoom())
-            drawCurrentRoom();
-
-
-       if (p1.getRoom() == currentLevel && !screen.isDoor(p1.getPoint()))
         {
-            p1.draw_player();
+           
+            drawCurrentRoom();
+            
+        }
+
+
+        if (p1.getRoom() == currentLevel && !screen.isDoor(p1.getPoint()))
+        {
+            
+           p1.draw_player();
+            
         }
 
         if (p2.getRoom() == currentLevel && !screen.isDoor(p2.getPoint()))
         {
-            p2.draw_player();
+            
+           p2.draw_player();
+            
         }
+        determine_score();
+        screen.drawStatus(p1, p2, score);
         
-        screen.drawStatus(p1, p2);
+        gotoxy(20, 22);
+        std::cout << "Springs in Room: " << screen.getSprings().size();
+        gotoxy(20, 23);
+        Spring* s = getSpringAt(p1.getPoint());
+        std::cout << "Spring detected: " << (s != nullptr ? "YES" : "NO") << "  ";
 
         game_Cycles++;
         key = 0;
         Sleep(100);
-
        
     }
     write_to_result_file(std::string("game over.\n"));
@@ -283,7 +306,9 @@ void Game::moveLevel(int index)
     cls();
     p1.setPower(1);
     p2.setPower(1);
+    
     drawCurrentRoom();
+    
 }
 void Game::Menu()
 {
@@ -296,7 +321,9 @@ void Game::Menu()
     while (!gameOver)
     {
         cls();
+        
         gameMenu.drawRoom();
+        
        
 
         char choice = _getch();
@@ -338,6 +365,7 @@ bool Game::pauseMenu()
 void Game::on_or_off_switch(Point& p, Screen& s)
 {
     char currentContext = s.charAt(p);
+
     if (currentContext == '/')
     {
         pressSwitches[currentLevel]++;
@@ -349,6 +377,7 @@ void Game::on_or_off_switch(Point& p, Screen& s)
         pressSwitches[currentLevel]--;
         s.setChar(p, '/');
     }
+   
 }
 
 bool Game::switchesOn(Screen& screen)
@@ -365,9 +394,9 @@ bool Game::enterRoom(Player& p)
     {
         gotoxy(pos.getX(), pos.getY());
         std::cout << target;
-
-
         int nextRoomIndex = target - '0';
+
+        
         if (p.getPoint().getChar() == '$')
         {
             write_to_result_file(std::string("player 1 moved from level ") + std::to_string(p.getRoom()) + " to level " + std::to_string(nextRoomIndex));
@@ -376,18 +405,49 @@ bool Game::enterRoom(Player& p)
         {
             write_to_result_file(std::string("player 2 moved from level ") + std::to_string(p.getRoom()) + " to level " + std::to_string(nextRoomIndex));
         }
-        p.setRoom(nextRoomIndex);
 
 
-        if (&p == &p1)
+        if (&p == &p1) 
         {
-            p.setPoint(levelStarts[nextRoomIndex].p1_x, levelStarts[nextRoomIndex].p1_y, Direction::directions[Direction::STAY]);
+            lastPositions[currentLevel].p1_x = p1.getPoint().getX();
+            lastPositions[currentLevel].p1_y = p1.getPoint().getY();
         }
+        else 
+        {
+            lastPositions[currentLevel].p2_x = p2.getPoint().getX();
+            lastPositions[currentLevel].p2_y = p2.getPoint().getY();
+        }
+        savedlevels[currentLevel] = screen;
+
+
+        if (levelUnlocked[nextRoomIndex])
+        {
+
+            int tx, ty;
+            tx = (&p == &p1) ? lastPositions[nextRoomIndex].p1_x : lastPositions[nextRoomIndex].p2_x;
+            ty = (&p == &p1) ? lastPositions[nextRoomIndex].p1_y : lastPositions[nextRoomIndex].p2_y;
+
+            if (savedlevels[nextRoomIndex].isDoor(Point(tx, ty))) {
+                tx += (tx < Screen::MAX_X - 2) ? 1 : -1;
+            }
+
+            p.setPoint(tx, ty, Direction::directions[Direction::STAY]);
+        
+        }
+
         else
         {
-            p.setPoint(levelStarts[nextRoomIndex].p2_x, levelStarts[nextRoomIndex].p2_y, Direction::directions[Direction::STAY]);
+            if (&p == &p1)
+            {
+                p.setPoint(levelStarts[nextRoomIndex].p1_x, levelStarts[nextRoomIndex].p1_y, Direction::directions[Direction::STAY]);
+            }
+            else
+            {
+                p.setPoint(levelStarts[nextRoomIndex].p2_x, levelStarts[nextRoomIndex].p2_y, Direction::directions[Direction::STAY]);
+            }
         }
         levelUnlocked[nextRoomIndex] = true;
+        p.setRoom(nextRoomIndex);
         p.setPower(1);
         return true;
 
@@ -414,9 +474,11 @@ bool Game::riddle_answers(Riddle r, Player& p)
         
 		write_to_result_file(std::string("player chose answer ") + answer + " and solved the riddle.\n" );
         gotoxy(18, 18);
+        
         std::cout << "RIGHT ANSWER! GOOD JOB";
         solved_Riddle = true;
         Sleep(1500);
+        
 
         return false;
     }
@@ -424,22 +486,25 @@ bool Game::riddle_answers(Riddle r, Player& p)
     {
 
         p.setLifePoints(p.getlifePoint() - 1);
+        update_score(-100);
         if (p.getlifePoint() != 0)
         {
             write_to_result_file(std::string("player chose answer ") + answer + " and was wrong. therefore he lost a life.\n");
-
+            
             gotoxy(17, 18);
             std::cout << "Wrong answer! Life points left: " << p.getlifePoint();
             Sleep(1500);
+            
             return true;
         }
         else
         {
             write_to_result_file(std::string("player chose answer ") + answer + " and was wrong. now he's dead, and the game is over.\n");
-
+            
             gotoxy(17, 18);
             std::cout << "WRONG ANSWER, GAME OVER!!!!!!!!";
             Sleep(1500);
+            
             return true;
         }
 
@@ -497,6 +562,7 @@ void Game::resetGame()
     bomb_explosion_p1.circle_setPoint(Point(-1, -1));
     bomb_explosion_p2.circle_setPoint(Point(-1, -1));
     std::ofstream res_file("adv-world.result", std::ios::trunc);
+    score = p1.getlifePoint() * 100 + p2.getlifePoint() * 100;
 
 }
 bool Game::Push(Screen& screen, Player& p, int bonus_power)
@@ -511,7 +577,8 @@ bool Game::Push(Screen& screen, Player& p, int bonus_power)
     int dx = dir.getdirx();
     int dy = dir.getdiry();
 
-    for (const auto& part : obstacle) {
+    for (const auto& part : obstacle)
+    {
         int nx = part.getX() + dx;
         int ny = part.getY() + dy;
         if (nx < 0 || nx >= Screen::MAX_X || ny < 0 || ny >= Screen::MAX_Y) return false;
@@ -522,7 +589,9 @@ bool Game::Push(Screen& screen, Player& p, int bonus_power)
     }
 
     for (const auto& part : obstacle) screen.setChar(part, ' ');
-    for (const auto& part : obstacle) {
+    for (const auto& part : obstacle)
+    {
+
         Point dest(part.getX() + dx, part.getY() + dy, dir, '*');
         screen.setChar(dest, '*');
     }
@@ -540,9 +609,18 @@ bool Game::pushing_together(Player& p1, Player& p2, Screen& screen) {
     return false;
 }
 
-void Game::stopPower(Player& p1, Player& p2) {
-    p1.setPower(1);
-    p2.setPower(1);
+void Game::stopPower(Player& p1, Player& p2)
+{
+    if (score >= 1000)
+    {
+        p1.setPower(2);
+        p2.setPower(2);
+    }
+    else
+    {
+        p1.setPower(1);
+        p2.setPower(1);
+    }
 }
 
 void Game::handleMovement(Player& p, Player& other, bool clearPass) //handling the movement of player p, considering other player and if can pass doors
@@ -563,16 +641,27 @@ void Game::handleMovement(Player& p, Player& other, bool clearPass) //handling t
     {
         int targetRoom = screen.charAt(nextPos) - '0';
 
-       
-        if (targetRoom < 0 || targetRoom >= (int)levelUnlocked.size())
+        if (levelUnlocked[targetRoom])
         {
-            canMove = false;
+            canMove = true;
         }
+
         else if (targetRoom > currentLevel)
         {
-            
-            if (!levelUnlocked[targetRoom] && !clearPass)
+            if (clearPass)
+            {
+                levelUnlocked[targetRoom] = true;
+                p.setInventory('E');
+                canMove = true;
+            }
+            else
+            {
                 canMove = false;
+            }
+        }
+        else
+        {
+            canMove = false;
         }
         
     }
@@ -611,15 +700,13 @@ void Game::handleMovement(Player& p, Player& other, bool clearPass) //handling t
             bool is_player2_has_key = false;
             if (!p.isFullInventory())
             {
-              
-               
-               
+                if (charToStepOn == 'K')
+                {
+                    update_score(50);
+                }
                 p.pick_item(screen, charToStepOn);
                 p.setStepChar(' ');
-                p.set_justpicked(true);
-
-                
-               
+                p.set_justpicked(true);  
             }
         }
     }
@@ -643,16 +730,19 @@ void Game::boom(Circle c, Screen& screen)
                 if (p == p1.getPoint())
                 { 
                     write_to_result_file(std::string("player 1 was hit by a bomb and lost life point.\n"));
-
+                    update_score(-100);
                    p1.setLifePoints(p1.getlifePoint() - 1);
                 }
                 if (p == p2.getPoint())
                 {
                     write_to_result_file(std::string("player 2 was hit by a bomb and lost life point.\n"));
-
+                    update_score(-100);
                     p2.setLifePoints(p2.getlifePoint() - 1);
                 }
-
+                if (screen.charAt(p) == '*')
+                {
+                    update_score(10);
+                }
                 if (!screen.antiBoom(p))
                 {
                     screen.setChar(p, ' ');
@@ -665,6 +755,7 @@ void Game::boom(Circle c, Screen& screen)
     }
     p1.draw_player();
     p2.draw_player();
+    
 }
 bool Game::fileToArray(const std::string& filename, char dest[Screen::MAX_Y][Screen::MAX_X])
 {
@@ -730,9 +821,11 @@ void Game::handleInteraction(Player& p, Point point, char drop_key_press) //hand
                     if (screen.isWall(next) || (screen.isObstacle(next)) || screen.isSpring(next))
                         break;
                     gotoxy(bombCenter.getX(), bombCenter.getY());
+                    
                     std::cout << '@';
                     p1.draw_player();
                     p2.draw_player();
+                    
 
 
                     gotoxy(bombCenter.getX(), bombCenter.getY());
@@ -753,11 +846,15 @@ void Game::handleInteraction(Player& p, Point point, char drop_key_press) //hand
                     bomb_explosion_p2.circle_setPoint(bombCenter);
 
                 }
-
              
             }
+            
             else
             {
+                if (p.getinventory() == 'K')
+                {
+                    update_score(-50);
+                }
                 p.setStepChar(itemInHand);
                 p.drop_item(p.getPoint(), screen);
                 
@@ -829,9 +926,9 @@ bool Game::executeRiddle(Player& p)
 
     while (p.getlifePoint() > 0 && wrong)
     {
-        current_riddle.drawRoom();
-        screen.drawStatus(p1, p2);
-        wrong = riddle_answers(riddles[currentLevel], p);
+       current_riddle.drawRoom();
+       screen.drawStatus(p1, p2, score);
+       wrong = riddle_answers(riddles[currentLevel], p);
     }
 
     if (p.getlifePoint() > 0)
@@ -841,13 +938,16 @@ bool Game::executeRiddle(Player& p)
         p.setStepChar(' ');
         screen.setLegendPos(original_legendPos);
         cls();
-        screen.drawRoom();
+        int temp = currentLevel;
+        currentLevel = -1;
+        drawCurrentRoom();
+        currentLevel = temp;
+        drawCurrentRoom();
         p1.draw_player();
         p2.draw_player();
+        
         return true; //the riddle is solved
-
     }
-
     return false; // the player is dead and the game is over
 }
 void Game::handle_flying_movement(Player& p, Player& other, bool canPass, char key)//the situation after spring release 
@@ -884,7 +984,14 @@ void Game::release_spring(Player& p, Spring* spring, Screen& screen)//setting th
     Direction boostDir = spring->getReleaseDir();
 
     p.startLaunch(speed, game_cycles, boostDir);
-    p.setPower(1 + speed);
+    if (score >= 1000)
+    {
+        p.setPower(2 + speed);
+    }
+    else
+    {
+        p.setPower(1 + speed);
+    }
     p.setDirection(boostDir);
 
     for (int j = 0; j < speed; j++)
@@ -902,10 +1009,14 @@ void Game::release_spring(Player& p, Spring* spring, Screen& screen)//setting th
     for (const auto& pt : spring->getLocations())
     {
         screen.setChar(pt, '#');
+        
         gotoxy(pt.getX(), pt.getY());
         std::cout << '#';
+        
     }
+    
     p.draw_player();
+    
     spring->setcurrentCompressed(0);
 
 }
@@ -929,10 +1040,9 @@ void Game::handle_pre_spring_movement(Player& p, Player& other, bool canPass) //
             {
                 if (compressed(p, s))
                 {
-                    p.draw_player();
-                    Sleep(20);
-
-                    handleMovement(p, other, canPass);
+                   p.draw_player();
+                   Sleep(20);
+                   handleMovement(p, other, canPass);
                 }
             }
             else
@@ -976,8 +1086,12 @@ void Game::drawDarkRoom( Screen& s,  Circle& light)
 
             Point p(x, y);
 
-            if (light.inRange(p) ||(s.isDoor(p)))
-                std::cout << s.charAt(p);
+            if (light.inRange(p) || (s.isDoor(p)))
+            {
+                
+               std::cout << s.charAt(p);
+                
+            }
             else
                    std::cout << ' ';
 
@@ -1099,6 +1213,7 @@ void Game::Bomb_explosion_logic(Circle& c, bool& active_bomb, int& explode_at) /
         //screen.setChar(center_of_circle, char_timer);
         gotoxy(center_of_circle.getX(), center_of_circle.getY());
         std::cout << char_timer;
+        
     }
        
     
@@ -1304,4 +1419,27 @@ void Game::add_line_to_steps_from_riddle(int game_cycle, char key)
     {
         steps.push_back({ (size_t)game_cycle, key });
     }
+}
+
+
+void Game::determine_score()
+{
+    if (score < 0) 
+        score = 0;
+
+    int basePower = (score >= 1000) ? 2 : 1;//checking what is the base power according to score
+
+    if (p1.getPower() < basePower || !p1.isInBoost())
+    {
+        p1.setPower(basePower);
+    }
+
+    if (p2.getPower() < basePower || !p2.isInBoost())
+    {
+        p2.setPower(basePower);
+    }
+}
+void Game::update_score(int amount)
+{
+    score = score + amount;
 }

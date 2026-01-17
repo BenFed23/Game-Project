@@ -104,7 +104,7 @@ public:
 
 	void clearItem(const Point& p);
 	void drawRoom() const;
-	void drawStatus(const Player& p1, const Player& p2) const;
+	void drawStatus(const Player& p1, const Player& p2, int score) const;
 	std::vector<Point> getObstacleVector(Point startPoint);
 	bool isPointPartOfObstacle(const std::vector<Point>& obstacle, const Point& p) const;
 	bool loadefile(const std::string& filename, bool createBottom);

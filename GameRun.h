@@ -4,12 +4,12 @@
 #include <list>
 
 
-class GameRun:public Game
+class GameRun: public Game
 {
 	std::ofstream stepsFile;
 public:
 	
-	char handleinput() override;
+	virtual char handleinput() override;
 
 	
 };

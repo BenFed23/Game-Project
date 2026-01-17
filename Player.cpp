@@ -21,20 +21,24 @@ void Player::keyPressed(char ch)
 
 bool Player::move_player_(Screen& screen, bool canMove, char nextStepChar)
 {
+
 	if (!canMove)
 	{
 		point.draw();
 		return false;
 	}
 
-	point.draw(this->stepchar);
-
+	char charOnMap = screen.charAt(point);
+	if (charOnMap == '/' || charOnMap == '\\')
+	{
+		point.draw(charOnMap);
+	}
+	else
+	{
+		point.draw(this->stepchar);
+	}
 	point.move();
-
-
-
 	this->stepchar = nextStepChar;
-
 	point.draw();
 
 	return true;

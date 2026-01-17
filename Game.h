@@ -15,7 +15,7 @@ public:
 	static constexpr int Bomb_RADIUS = 3;
 private:
 	bool isDark = false;
-	static const int NUMLEVELS = 3;
+	static const int NUMLEVELS = 4;
 	Screen screen;
 	Screen current_riddle;
 	Screen gameMenu;
@@ -46,6 +46,7 @@ private:
 	int explode_at_p1 = -1;
 	int explode_at_p2 = -1;
 	bool initFailed = false;
+	int score = 100;
 	std::string initErrorMsg;
 	const char validKeys[24] =
 	{
@@ -62,6 +63,7 @@ private:
 	}; 
 
 
+
 protected:
 	int game_Cycles = 0;
 	std::list<std::pair<size_t, char>> steps; // pair: iteration, step
@@ -70,9 +72,8 @@ protected:
 
 public:
 
-
 	Game();
-
+    protected:
 	struct StartPositions
 	{
 		int p1_x, p1_y;
@@ -85,10 +86,20 @@ public:
 		{5, 5, 20, 5},  //level2
 		{2, 2, 70, 18} //level3
 	};
-	void run();
+	StartPositions lastPositions[NUMLEVELS];
+
+public:
+
+	int get_score()
+	{
+		return score;
+	}
+	void determine_score();
+
+	virtual void run();
 	virtual char handleinput() = 0;
 	void moveLevel(int index);
-	void Menu();
+	virtual void Menu();
 	bool pauseMenu();
 	void on_or_off_switch(Point& p, Screen& s);
 	bool switchesOn(Screen& screen);
@@ -122,5 +133,7 @@ public:
 	void add_line_to_steps_from_riddle(int game_cycle, char key);
 
 	void write_to_result_file(const std::string& message);
+	void update_score(int amount);
+
 
 };
