@@ -4,14 +4,16 @@
 #include <cmath>
 #include "Direction.h"
 
-class Point {
+class Point 
+{
 	int x = 0, y = 0;
 	Direction dir = Direction::directions[Direction::RIGHT];
 	char ch = ' ';
 public:
 	Point() {}
 	
-	Point(int x1, int y1, const Direction& the_dir, char c) {
+	Point(int x1, int y1, const Direction& the_dir, char c) 
+	{
 		x = x1;
 		y = y1;
 		dir = the_dir;

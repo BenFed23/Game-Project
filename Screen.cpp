@@ -140,7 +140,7 @@ void Screen::clearItem(const Point& p)
     std::cout << ' ';
 }
 
-void Screen::drawStatus(const Player& p1, const Player& p2) const
+void Screen::drawStatus(const Player& p1, const Player& p2, int score) const
 {
   
 
@@ -159,13 +159,13 @@ void Screen::drawStatus(const Player& p1, const Player& p2) const
         std::cout << "Power: " << p1.getPower();
         if (darkmode && p1.getinventory() != '!' && p2.getinventory() != '!')
         {
-            gotoxy(15, 23);
+            gotoxy(15, 22);
             std::cout << "Notice: you are in a dark room without a torch!";
-            gotoxy(15, 24);
+            gotoxy(15, 23);
             std::cout << "You must to go back and get a torch to see!";
         }
 		gotoxy(30, legendPos_Y);
-		std::cout << "score: " << p1.getlifePoint() * 100 + p1.getPower() * 50;
+		std::cout << "score: " << score << " ";
         gotoxy(65, legendPos_Y);
         std::cout << "P2 Life: " << p2.getlifePoint();
         gotoxy(65, legendPos_Y + 1);
